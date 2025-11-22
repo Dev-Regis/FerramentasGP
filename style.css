@@ -1,0 +1,866 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+    transition: background 0.3s ease;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+}
+
+.profile-image {
+    margin-bottom: 20px;
+}
+
+.profile-image img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.profile-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.profile-name h1 {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.verification-badge {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.link-button {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.link-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.link-button .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.link-button span {
+    font-weight: 500;
+    font-size: 16px;
+    flex: 1;
+    text-align: left;
+}
+
+/* Seta para expandir sub-menus */
+.link-button .arrow {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    font-size: 14px;
+}
+
+.link-button .arrow i {
+    color: inherit;
+}
+
+/* Rotaciona seta quando o item está aberto */
+details[open] .link-button .arrow i {
+    transform: rotate(180deg);
+}
+
+.timestamp {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.share-button {
+    /* Posiciona o botão de compartilhamento dentro do cartão principal (container).
+       Ele fica alinhado ao canto inferior esquerdo do cartão, acima do padding,
+       semelhante ao botão de configurações que permanece no canto inferior direito do cartão. */
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 1000;
+}
+
+.share-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.share-button i {
+    color: white;
+    font-size: 18px;
+}
+
+.settings-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 1000;
+}
+
+.settings-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.settings-toggle i {
+    color: white;
+    font-size: 18px;
+}
+
+.settings-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 2000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    max-width: 350px;
+    width: 90%;
+}
+
+.settings-panel.active {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+
+.settings-panel h3 {
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.setting-group {
+    margin-bottom: 20px;
+}
+
+.setting-group label {
+    display: block;
+    margin-bottom: 10px;
+    color: #333;
+    font-weight: 500;
+}
+
+.color-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    border-color: #333;
+}
+
+.color-option.active {
+    border-color: #333;
+    transform: scale(1.1);
+}
+
+input[type="url"], input[type="range"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    .container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+    
+    .profile-name h1 {
+        font-size: 20px;
+    }
+    
+    .link-button {
+        padding: 12px 15px;
+    }
+    
+    .link-button span {
+        font-size: 14px;
+    }
+    
+    .settings-panel {
+        width: 95%;
+        padding: 20px;
+    }
+}
+
+/* Classes para diferentes gradientes */
+.gradient1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.gradient2 {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
+
+.gradient3 {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+.gradient4 {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.container {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.link-button {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.link-button:nth-child(1) { animation-delay: 0.1s; }
+.link-button:nth-child(2) { animation-delay: 0.2s; }
+.link-button:nth-child(3) { animation-delay: 0.3s; }
+.link-button:nth-child(4) { animation-delay: 0.4s; }
+.link-button:nth-child(5) { animation-delay: 0.5s; }
+
+
+
+
+/* Novas classes de gradiente */
+.gradient5 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%) !important; }
+.gradient6 { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%) !important; }
+.gradient7 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important; }
+.gradient8 { background: linear-gradient(135deg, #c471f5 0%, #fa71cd 100%) !important; }
+.gradient9 { background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%) !important; }
+.gradient10 { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%) !important; }
+.gradient11 { background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%) !important; }
+.gradient12 { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%) !important; }
+.gradient13 { background: linear-gradient(135deg, #cfd9ed 0%, #e2e7f3 100%) !important; }
+.gradient14 { background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%) !important; }
+
+
+
+
+/* Estilos para Música de Fundo foram removidos */
+
+/* Estilos para Modo Escuro */
+.dark-mode-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 1000;
+}
+
+.dark-mode-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.dark-mode-toggle i {
+    color: white;
+    font-size: 18px;
+}
+
+body.dark-mode {
+    background: #1a1a2e !important;
+}
+
+body.dark-mode .container {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .profile-name h1,
+body.dark-mode .timestamp {
+    color: #e0e0e0;
+}
+
+body.dark-mode .link-button {
+    background: rgba(0, 0, 0, 0.4);
+    color: #e0e0e0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .link-button:hover {
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .link-button .icon {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .share-button,
+body.dark-mode .settings-toggle {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .share-button:hover,
+body.dark-mode .settings-toggle:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .share-button i,
+body.dark-mode .settings-toggle i {
+    color: #e0e0e0;
+}
+
+body.dark-mode .settings-panel {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .settings-panel h3,
+body.dark-mode .settings-panel label {
+    color: #e0e0e0;
+}
+
+body.dark-mode .color-option {
+    border-color: transparent;
+}
+
+body.dark-mode .color-option.active {
+    border-color: #e0e0e0;
+}
+
+body.dark-mode input[type="url"],
+body.dark-mode input[type="range"] {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+body.dark-mode button {
+    background: linear-gradient(135deg, #3a3a52 0%, #2c2c3e 100%);
+    color: #e0e0e0;
+}
+
+/* Estilos para o Canvas de Efeitos Visuais */
+#interactiveCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Fica atrás de todo o conteúdo */
+}
+
+/* Controles de seleção de tema */
+.theme-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.theme-option {
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.8);
+    color: #333;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    user-select: none;
+}
+
+.theme-option:hover {
+    transform: scale(1.05);
+}
+
+.theme-option.active {
+    border: 2px solid #333;
+}
+
+/* Temas personalizados */
+body.theme-minimalist {
+    background: #f5f5f5 !important;
+}
+
+body.theme-minimalist .container {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ddd;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+body.theme-minimalist .profile-name h1,
+body.theme-minimalist .timestamp {
+    color: #333;
+}
+
+body.theme-minimalist .link-button {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.theme-minimalist .link-button:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+body.theme-minimalist .link-button .icon {
+    background: #e0e0e0;
+    color: #444;
+}
+
+body.theme-minimalist .share-button,
+body.theme-minimalist .settings-toggle,
+body.theme-minimalist .dark-mode-toggle {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+body.theme-minimalist .share-button:hover,
+body.theme-minimalist .settings-toggle:hover,
+body.theme-minimalist .dark-mode-toggle:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-minimalist .share-button i,
+body.theme-minimalist .settings-toggle i,
+body.theme-minimalist .dark-mode-toggle i {
+    color: #333;
+}
+
+body.theme-contrast {
+    background: #121212 !important;
+}
+
+body.theme-contrast .container {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+}
+
+body.theme-contrast .profile-name h1,
+body.theme-contrast .timestamp {
+    color: #f5f5f5;
+}
+
+body.theme-contrast .link-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f5f5f5;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.theme-contrast .link-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.theme-contrast .link-button .icon {
+    background: #005bea;
+    color: #ffffff;
+}
+
+body.theme-contrast .share-button,
+body.theme-contrast .settings-toggle,
+body.theme-contrast .dark-mode-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.theme-contrast .share-button:hover,
+body.theme-contrast .settings-toggle:hover,
+body.theme-contrast .dark-mode-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.theme-contrast .share-button i,
+body.theme-contrast .settings-toggle i,
+body.theme-contrast .dark-mode-toggle i {
+    color: #f5f5f5;
+}
+
+body.theme-pastel {
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%) !important;
+}
+
+body.theme-pastel .container {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+body.theme-pastel .profile-name h1,
+body.theme-pastel .timestamp {
+    color: #333;
+}
+
+body.theme-pastel .link-button {
+    background: rgba(255, 255, 255, 0.85);
+    color: #333;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+body.theme-pastel .link-button:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+body.theme-pastel .link-button .icon {
+    background: #ffd1dc;
+    color: #5c5c5c;
+}
+
+body.theme-pastel .share-button,
+body.theme-pastel .settings-toggle,
+body.theme-pastel .dark-mode-toggle {
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+body.theme-pastel .share-button:hover,
+body.theme-pastel .settings-toggle:hover,
+body.theme-pastel .dark-mode-toggle:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+body.theme-pastel .share-button i,
+body.theme-pastel .settings-toggle i,
+body.theme-pastel .dark-mode-toggle i {
+    color: #333;
+}
+
+/* === Estrutura de sub-menus para botões === */
+details.link-item {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ocultar marcador padrão do elemento summary */
+summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Sub-menu inicialmente oculto; torna-se visível quando o elemento details está aberto */
+details.link-item .sub-menu {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+details.link-item[open] .sub-menu {
+    display: flex;
+}
+
+/* Estilos base para itens do sub-menu */
+.sub-menu-item {
+    display: flex;
+    align-items: center;
+    /* Alinhar conteúdo à esquerda para acomodar ícone e texto */
+    justify-content: flex-start;
+    /* Espaço entre o ícone e o texto */
+    gap: 8px;
+    padding: 10px 16px; /* um pouco menor que o botão principal */
+    width: 80%; /* reduz largura para indicar subnível */
+    margin: 0 auto; /* centraliza dentro do contêiner */
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.sub-menu-item:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Sub-menu em modo escuro */
+body.dark-mode .sub-menu-item {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .sub-menu-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Sub-menu no tema minimalista */
+body.theme-minimalist .sub-menu-item {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+body.theme-minimalist .sub-menu-item:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* Sub-menu no tema contrastante */
+body.theme-contrast .sub-menu-item {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f5f5f5;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+body.theme-contrast .sub-menu-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Sub-menu no tema pastel */
+body.theme-pastel .sub-menu-item {
+    background: rgba(255, 255, 255, 0.85);
+    color: #333;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+body.theme-pastel .sub-menu-item:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* === Modal de Senha === */
+.password-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none; /* Exibe via script quando necessário */
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.password-modal .modal-content {
+    background: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+}
+
+.password-modal .modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #333;
+}
+
+.password-modal .modal-content input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.password-modal .modal-content button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #667eea;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.password-modal .modal-content button:hover {
+    background: #5a6ddc;
+}
+
+/* Nota de expiração abaixo do campo de senha */
+.password-modal .password-expiration-note {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Modo escuro para a nota de expiração */
+body.dark-mode .password-modal .password-expiration-note {
+    color: #bbb;
+}
+
+/* Subtítulo abaixo do título da modal de senha */
+.password-modal .modal-content .modal-subheading {
+    margin-top: -10px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Subtítulo em modo escuro */
+body.dark-mode .password-modal .modal-content .modal-subheading {
+    color: #ccc;
+}
+
+/* Modal em modo escuro */
+body.dark-mode .password-modal .modal-content {
+    background: #2c2c3e;
+    color: #e0e0e0;
+}
+
+body.dark-mode .password-modal .modal-content input[type="password"] {
+    background: #3a3a52;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+body.dark-mode .password-modal .modal-content button {
+    background: #3a57d1;
+}
+
+body.dark-mode .password-modal .modal-content button:hover {
+    background: #324abc;
+}
+
+

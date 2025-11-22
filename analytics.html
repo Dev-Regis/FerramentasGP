@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatísticas de Acesso</title>
+    <!-- Utilizamos a mesma paleta de cores do projeto principal -->
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* A cor de fundo será ajustada dinamicamente via JavaScript conforme as preferências salvas */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            transition: background 0.3s ease;
+        }
+
+        .analytics-container {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .metrics p {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .metrics span {
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            color: #333;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        /* Linha de histórico quando o visitante ainda está online (últimos 10s) */
+        tr.online {
+            background: rgba(144, 238, 144, 0.3);
+        }
+
+        /* Estilo para o contêiner do gráfico */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 30px;
+        }
+
+
+        /* Wrapper para permitir rolagem horizontal em telas pequenas */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        /* Responsividade: ajustar fontes e espaçamentos em telas estreitas */
+        @media (max-width: 600px) {
+            .analytics-container {
+                padding: 20px;
+            }
+            h1, h2 {
+                font-size: 20px;
+            }
+            .metrics p {
+                font-size: 14px;
+            }
+            th, td {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+
+        /* Estilos para temas escuros */
+        body.theme-contrast .analytics-container {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        body.theme-contrast h1,
+        body.theme-contrast h2,
+        body.theme-contrast .metrics p,
+        body.theme-contrast th,
+        body.theme-contrast td {
+            color: #f5f5f5;
+        }
+
+        body.theme-contrast th {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.theme-contrast tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Destaque para linha online em tema contrastante */
+        body.theme-contrast tr.online {
+            background: rgba(144, 238, 144, 0.2);
+        }
+
+        /* Ajustes para tema pastel */
+        body.theme-pastel .analytics-container {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        body.theme-pastel h1,
+        body.theme-pastel h2,
+        body.theme-pastel .metrics p,
+        body.theme-pastel th,
+        body.theme-pastel td {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="analytics-container">
+        <h1>Estatísticas de Acesso</h1>
+        <div class="metrics">
+            <p>Total de Visitas: <span id="totalVisits">0</span></p>
+            <p>Dispositivos – Celular: <span id="mobileCount">0</span>, Desktop: <span id="desktopCount">0</span></p>
+            <p>Sistemas Operacionais: <span id="osCounts"></span></p>
+            <p>Navegadores: <span id="browserCounts"></span></p>
+            <p>Idiomas: <span id="languageCounts"></span></p>
+            <p>Referenciadores: <span id="referrerCounts"></span></p>
+            <p>Cidades: <span id="cityCounts"></span></p>
+            <p>Países: <span id="countryCounts"></span></p>
+            <p>Membros Online (últimos 10s): <span id="onlineCount">0</span></p>
+        </div>
+        <!-- Gráfico de visitas e visualizações (últimos 30 dias) -->
+        <h2>Desempenho (últimos 30 dias)</h2>
+        <div class="chart-container">
+            <canvas id="analyticsChart" width="400" height="200"></canvas>
+            <!-- Tooltip para mostrar valores ao passar o mouse sobre os pontos do gráfico -->
+            <div id="chartTooltip" style="position:absolute; padding:6px 10px; background:rgba(0,0,0,0.7); color:#fff; border-radius:4px; font-size:12px; pointer-events:none; display:none; z-index:10;"></div>
+        </div>
+
+        <h2>Histórico de Entradas</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>País/Cidade</th>
+                        <th>Dispositivo</th>
+                        <th>Sistema/Navegador</th>
+                        <th>Referenciador</th>
+                        <th>Quando</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+    // Lista de pontos para exibição de tooltip. Será atualizada a cada renderização do gráfico.
+    let chartPoints = [];
+    // === Lógica para Gráfico Personalizado ===
+    // Desenha um gráfico de linhas simples no canvas para as métricas dos últimos 30 dias.
+    function drawLineChart(labels, pageViewsData, visitorsData) {
+        const canvas = document.getElementById('analyticsChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        // Limpar canvas
+        ctx.clearRect(0, 0, width, height);
+        // Redefinir pontos
+        chartPoints = [];
+        // Configurações de margem e dimensões internas
+        const margin = 40;
+        const chartWidth = width - margin * 2;
+        const chartHeight = height - margin * 2;
+        // Determinar valor máximo das séries para escala
+        const maxVal = Math.max(...pageViewsData, ...visitorsData, 1);
+        // Funções de transformação de coordenadas
+        const getX = (i) => margin + (chartWidth / (labels.length - 1)) * i;
+        const getY = (value) => margin + chartHeight - (value / maxVal) * chartHeight;
+        // Desenhar eixos
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(margin, margin);
+        ctx.lineTo(margin, margin + chartHeight);
+        ctx.lineTo(margin + chartWidth, margin + chartHeight);
+        ctx.stroke();
+        // Traçar linhas de grade horizontal
+        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+        ctx.setLineDash([4, 4]);
+        for (let j = 0; j <= 4; j++) {
+            const y = margin + (chartHeight / 4) * j;
+            ctx.beginPath();
+            ctx.moveTo(margin, y);
+            ctx.lineTo(margin + chartWidth, y);
+            ctx.stroke();
+            // Label do eixo Y
+            ctx.fillStyle = '#666';
+            ctx.setLineDash([]);
+            const val = Math.round(maxVal - (maxVal / 4) * j);
+            ctx.fillText(val.toString(), 5, y + 4);
+        }
+        ctx.setLineDash([]);
+        // Desenhar linha de página vistas (verde)
+        ctx.strokeStyle = '#2ecc71';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        pageViewsData.forEach((val, i) => {
+            const x = getX(i);
+            const y = getY(val);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        // Pontos verdes
+        ctx.fillStyle = '#2ecc71';
+        pageViewsData.forEach((val, i) => {
+            const x = getX(i);
+            const y = getY(val);
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fill();
+            // Armazenar ponto para tooltip
+            chartPoints.push({ x, y, value: val, label: labels[i], type: 'Visualizações' });
+        });
+        // Desenhar linha de visitantes (azul)
+        ctx.strokeStyle = '#3498db';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        visitorsData.forEach((val, i) => {
+            const x = getX(i);
+            const y = getY(val);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        // Pontos azuis
+        ctx.fillStyle = '#3498db';
+        visitorsData.forEach((val, i) => {
+            const x = getX(i);
+            const y = getY(val);
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fill();
+            // Armazenar ponto para tooltip (mesma posição para visitantes)
+            chartPoints.push({ x, y, value: val, label: labels[i], type: 'Visitantes' });
+        });
+        // Rótulos do eixo X (mostrar apenas alguns para evitar sobreposição)
+        ctx.fillStyle = '#666';
+        ctx.font = '10px Arial';
+        labels.forEach((lbl, i) => {
+            const x = getX(i);
+            const y = margin + chartHeight + 15;
+            // Mostrar rótulo a cada 5 dias para clareza
+            if (i % 5 === 0 || i === labels.length - 1) {
+                ctx.fillText(lbl, x - 15, y);
+            }
+        });
+        // Armazena os dados do gráfico e funções de coordenadas para uso em tooltips
+        window._chartData = {
+            labels: labels,
+            pageViewsData: pageViewsData,
+            visitorsData: visitorsData,
+            margin: margin,
+            chartWidth: chartWidth,
+            chartHeight: chartHeight,
+            getX: getX,
+            getY: getY
+        };
+        // Configurar tooltip com base na posição horizontal do mouse sobre o gráfico.
+        const tooltip = document.getElementById('chartTooltip');
+        // Remove handlers antigos para evitar acumulação
+        canvas.onmousemove = function (e) {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const cd = window._chartData;
+            if (!cd) return;
+            // Verifica se o mouse está dentro da área do gráfico
+            if (mx < cd.margin || mx > cd.margin + cd.chartWidth || my < cd.margin || my > cd.margin + cd.chartHeight) {
+                tooltip.style.display = 'none';
+                return;
+            }
+            // Encontra o índice mais próximo baseado na posição horizontal do mouse
+            const relativeX = mx - cd.margin;
+            const step = cd.chartWidth / (cd.labels.length - 1);
+            let idx = Math.round(relativeX / step);
+            idx = Math.max(0, Math.min(cd.labels.length - 1, idx));
+            // Recupera os valores para esse índice
+            const label = cd.labels[idx];
+            const pageViews = cd.pageViewsData[idx];
+            const visitors = cd.visitorsData[idx];
+            tooltip.style.display = 'block';
+            tooltip.innerHTML = `<strong>${label}</strong><br>Visualizações: ${pageViews}<br>Visitantes: ${visitors}`;
+            // Posiciona o tooltip próximo ao cursor, ajustando se sair do contêiner
+            const containerRect = canvas.parentElement.getBoundingClientRect();
+            let left = e.clientX - containerRect.left + 10;
+            let top = e.clientY - containerRect.top + 10;
+            const tooltipRect = tooltip.getBoundingClientRect();
+            if (left + tooltipRect.width > containerRect.width) {
+                left = containerRect.width - tooltipRect.width - 10;
+            }
+            if (top + tooltipRect.height > containerRect.height) {
+                top = containerRect.height - tooltipRect.height - 10;
+            }
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        };
+        canvas.onmouseleave = function () {
+            tooltip.style.display = 'none';
+        };
+    }
+
+    // Calcula os dados para os últimos 30 dias e desenha o gráfico.
+    function updateChart() {
+        const data = JSON.parse(localStorage.getItem('analyticsData')) || [];
+        // Construir arrays de datas (últimos 30 dias)
+        const labels = [];
+        const pageViews = [];
+        const visitors = [];
+        const now = new Date();
+        // Mapa para contagens diárias
+        const dailyVisits = {};
+        const dailyUnique = {};
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+            const key = date.toLocaleDateString('pt-BR');
+            labels.push(key.split('/').slice(0, 2).join(' / ')); // mostra dia/mês
+            dailyVisits[key] = 0;
+            dailyUnique[key] = new Set();
+        }
+        data.forEach(item => {
+            const d = new Date(item.timestamp);
+            const key = d.toLocaleDateString('pt-BR');
+            if (dailyVisits.hasOwnProperty(key)) {
+                dailyVisits[key]++;
+                // Usamos uma combinação de alguns atributos para estimar visitante único
+                const uniqueId = `${item.deviceType}|${item.os}|${item.browser}|${item.country}|${item.city}|${item.language}`;
+                dailyUnique[key].add(uniqueId);
+            }
+        });
+        labels.forEach(lbl => {
+            // Reconstrói a data para o mapa original: dd / mm vs dd/mm/aaaa
+            const parts = lbl.split(' / ');
+            const normalized = `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${now.getFullYear()}`;
+            pageViews.push(dailyVisits[normalized] || 0);
+            visitors.push(dailyUnique[normalized] ? dailyUnique[normalized].size : 0);
+        });
+        drawLineChart(labels, pageViews, visitors);
+    }
+    // Carrega as preferências visuais para o analytics: tema ou gradiente da página principal
+    function loadVisualPreferences() {
+        const themes = ['theme-minimalist','theme-contrast','theme-pastel'];
+        const gradients = ['gradient1','gradient2','gradient3','gradient4','gradient5','gradient6','gradient7','gradient8','gradient9','gradient10','gradient11','gradient12','gradient13','gradient14'];
+        const savedTheme = localStorage.getItem('selectedTheme');
+        if (savedTheme) {
+            themes.forEach(t => document.body.classList.remove(t));
+            document.body.classList.add(savedTheme);
+        } else {
+            const savedColor = localStorage.getItem('backgroundColor');
+            if (savedColor) {
+                document.body.className = savedColor;
+            } else {
+                document.body.className = 'gradient1';
+            }
+        }
+    }
+
+    // Formata tempo relativo (ex: "Há 5 minutos").
+    function formatRelativeTime(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const seconds = Math.floor(diff / 1000);
+        if (seconds < 60) return `Há ${seconds} seg`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `Há ${minutes} min`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `Há ${hours} h`;
+        const days = Math.floor(hours / 24);
+        return `Há ${days} d`;
+    }
+
+    // Constrói uma string de contagem a partir de um objeto {chave: contagem}
+    function buildCountString(obj) {
+        return Object.entries(obj).map(([key, val]) => `${key} (${val})`).join(', ');
+    }
+
+    function updateAnalyticsDisplay() {
+        const data = JSON.parse(localStorage.getItem('analyticsData')) || [];
+        const totalVisits = data.length;
+        // Contadores
+        let mobile = 0;
+        let desktop = 0;
+        const osCounts = {};
+        const browserCounts = {};
+        const languageCounts = {};
+        const referrerCounts = {};
+        const cityCounts = {};
+        const countryCounts = {};
+        const now = Date.now();
+        let online = 0;
+
+        data.forEach(item => {
+            if (item.deviceType === 'Celular') mobile++;
+            if (item.deviceType === 'Desktop') desktop++;
+            osCounts[item.os] = (osCounts[item.os] || 0) + 1;
+            browserCounts[item.browser] = (browserCounts[item.browser] || 0) + 1;
+            languageCounts[item.language] = (languageCounts[item.language] || 0) + 1;
+            referrerCounts[item.referrer] = (referrerCounts[item.referrer] || 0) + 1;
+            cityCounts[item.city] = (cityCounts[item.city] || 0) + 1;
+            countryCounts[item.country] = (countryCounts[item.country] || 0) + 1;
+            if (now - item.timestamp <= 10000) online++;
+        });
+
+        document.getElementById('totalVisits').textContent = totalVisits;
+        document.getElementById('mobileCount').textContent = mobile;
+        document.getElementById('desktopCount').textContent = desktop;
+        document.getElementById('osCounts').textContent = buildCountString(osCounts);
+        document.getElementById('browserCounts').textContent = buildCountString(browserCounts);
+        document.getElementById('languageCounts').textContent = buildCountString(languageCounts);
+        document.getElementById('referrerCounts').textContent = buildCountString(referrerCounts);
+        document.getElementById('cityCounts').textContent = buildCountString(cityCounts);
+        document.getElementById('countryCounts').textContent = buildCountString(countryCounts);
+        document.getElementById('onlineCount').textContent = online;
+
+        // Preencher tabela de histórico
+        const tbody = document.getElementById('historyBody');
+        tbody.innerHTML = '';
+        // Ordem decrescente de tempo (mais recente primeiro)
+        const sorted = data.sort((a, b) => b.timestamp - a.timestamp);
+        sorted.forEach(item => {
+            const tr = document.createElement('tr');
+            const when = formatRelativeTime(item.timestamp);
+            // Determina se este visitante está online (últimos 10 segundos)
+            if (now - item.timestamp <= 10000) {
+                tr.classList.add('online');
+            }
+            tr.innerHTML = `
+                <td>${item.country}/${item.city}</td>
+                <td>${item.deviceType}</td>
+                <td>${item.os} / ${item.browser}</td>
+                <td>${item.referrer}</td>
+                <td>${when}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Atualizar o gráfico após recomputar as métricas
+        updateChart();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadVisualPreferences();
+        updateAnalyticsDisplay();
+        // Atualiza a cada 10 segundos
+        setInterval(updateAnalyticsDisplay, 10000);
+    });
+    </script>
+</body>
+</html>
