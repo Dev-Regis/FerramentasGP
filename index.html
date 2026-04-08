@@ -46,7 +46,7 @@
                         <i class="fas fa-tools"></i>
                     </div>
                     <!-- Título do botão alterado para Ferramentas TPM -->
-                    <span>Ferramentas TPM</span>
+                    <span>Ferramentas do TPM</span>
                     <div class="arrow"><i class="fas fa-chevron-down"></i></div>
                 </summary>
                 <div class="sub-menu">
@@ -61,6 +61,45 @@
                     <a href="#" class="sub-menu-item" data-link="https://i.ibb.co/XcDbZg6/983f45df6ba7c24b75cbd3f52ad52b3b-1.jpg"><i class="fas fa-question-circle"></i><span>BI l Ajuda</span></a>
                 </div>
             </details>
+
+ <details class="link-item">
+    <summary class="link-button">
+        <div class="icon">
+            <i class="fas fa-tools"></i>
+        </div>
+        <span>Ferramentas do Envase</span>
+        <div class="arrow"><i class="fas fa-chevron-down"></i></div>
+    </summary>
+
+    <div class="sub-menu">
+        <a href="#" class="sub-menu-item" data-file="dicolub/dicolub.html">
+            <i class="fas fa-toolbox"></i> Calc Dicolub
+        </a>
+        <a href="#" class="sub-menu-item" data-file="oee/Calc-OEE.html">
+            <i class="fas fa-cogs"></i> Calc OEE
+        </a>
+    </div>
+</details>
+
+<!-- Item de link com sub-menu: Registro / Rh -->
+            <details class="link-item">
+                <summary class="link-button">
+                    <div class="icon">
+                        <!-- Ícone de Registro / RH (substitui o logo do YouTube) -->
+                        <!-- Ícone mais específico para Registro / RH -->
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <!-- Título do botão alterado para Registro / Rh -->
+                    <span>Registro / Rh</span>
+                    <div class="arrow"><i class="fas fa-chevron-down"></i></div>
+                </summary>
+                <div class="sub-menu">
+                    <a href="#" class="sub-menu-item" data-link="https://forms.office.com/Pages/ResponsePage.aspx?id=YaUhhsQ11EiWizqpu7MLx-SsUlWw5gFMoMhXge-WtjBUOUpWSEtFRE5TQTBCWkY3RlRDQkJPNDFCNS4u&qrcode=true"><i class="fas fa-file-signature"></i><span>Registro de LPP</span></a>
+                    <a href="#" class="sub-menu-item" data-link="https://azmkmyayc.accounts.ondemand.com/saml2/idp/sso?sp=https://www.successfactors.com/cervejaria&idp=azmkmyayc.accounts.ondemand.com"><i class="fas fa-user-tie"></i><span>RH Digital 1</span></a>
+                    <a href="#" class="sub-menu-item" data-link="http://hcm19.sapsf.com/login#/login"><i class="fas fa-user-tie"></i><span>RH Digital 2</span></a>
+                </div>
+            </details>
+            
 
             <!-- Item de link com sub-menu: Forms Envase -->
             <details class="link-item">
@@ -82,42 +121,6 @@
                 </div>
             </details>
 
-            <!-- Item de link com sub-menu: Registro / Rh -->
-            <details class="link-item">
-                <summary class="link-button">
-                    <div class="icon">
-                        <!-- Ícone de Registro / RH (substitui o logo do YouTube) -->
-                        <!-- Ícone mais específico para Registro / RH -->
-                        <i class="fas fa-user-friends"></i>
-                    </div>
-                    <!-- Título do botão alterado para Registro / Rh -->
-                    <span>Registro / Rh</span>
-                    <div class="arrow"><i class="fas fa-chevron-down"></i></div>
-                </summary>
-                <div class="sub-menu">
-                    <a href="#" class="sub-menu-item" data-link="https://forms.office.com/Pages/ResponsePage.aspx?id=YaUhhsQ11EiWizqpu7MLx-SsUlWw5gFMoMhXge-WtjBUOUpWSEtFRE5TQTBCWkY3RlRDQkJPNDFCNS4u&qrcode=true"><i class="fas fa-file-signature"></i><span>Registro de LPP</span></a>
-                    <a href="#" class="sub-menu-item" data-link="https://azmkmyayc.accounts.ondemand.com/saml2/idp/sso?sp=https://www.successfactors.com/cervejaria&idp=azmkmyayc.accounts.ondemand.com"><i class="fas fa-user-tie"></i><span>RH Digital 1</span></a>
-                    <a href="#" class="sub-menu-item" data-link="http://hcm19.sapsf.com/login#/login"><i class="fas fa-user-tie"></i><span>RH Digital 2</span></a>
-                </div>
-            </details>
-
-            <!-- Item de link com sub-menu: WhatsApp -->
-            <!-- <details class="link-item"> -->
-                <!-- <summary class="link-button"> -->
-                    <!-- <div class="icon"> -->
-                        <!-- <i class="fab fa-whatsapp"></i> -->
-                    <!-- </div> -->
-                    <!-- <span>WhatsApp</span>
-                    <div class="arrow"><i class="fas fa-chevron-down"></i></div>
-                <!-- </summary> -->
-                <!-- <div class="sub-menu">
-                    <!-- <a href="#" class="sub-menu-item" data-link="#">Opção 1</a> -->
-                    <!-- <a href="#" class="sub-menu-item" data-link="#">Opção 2</a> -->
-                    <!-- <a href="#" class="sub-menu-item" data-link="#">Opção 3</a> -->
-                    <!-- <a href="#" class="sub-menu-item" data-link="#">Opção 4</a> -->
-                    <!-- <a href="#" class="sub-menu-item" data-link="#">Opção 5</a> -->
-                <!-- </div>
-            <!-- </details>
 
             <!-- Item de link com sub-menu: Website -->
             <!-- <details class="link-item"> -->
@@ -393,5 +396,40 @@ canvas {
     animate();
 })();
     </script>
+
+    
+
+<script>
+document.querySelectorAll('.sub-menu-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const link = this.getAttribute('data-link');
+        const file = this.getAttribute('data-file');
+
+        // 🔹 Se for LINK (internet)
+        if (link && link !== "#") {
+            window.open(link, "_blank");
+            return;
+        }
+
+        // 🔹 Se for ARQUIVO LOCAL
+        if (file) {
+            window.location.href = file;
+            return;
+        }
+
+        // 🔹 Se não tiver nada
+        console.warn("Nada configurado");
+    });
+});
+</script>
+
+
+<script>
+window.alert = function() {}; // mata todos os alerts
+</script>
+
 </body>
 </html>
