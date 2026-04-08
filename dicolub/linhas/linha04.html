@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DICOLUB - Linha: 04</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .results-section {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .results-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 8px 15px;
+            border-radius: 8px;
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .final-result {
+            background: #2d3748;
+            color: white;
+            font-size: 1.3rem;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .status-green {
+            background: linear-gradient(135deg, #48bb78, #38a169) !important;
+            color: white !important;
+        }
+
+        .status-yellow {
+            background: linear-gradient(135deg, #ed8936, #dd6b20) !important;
+            color: white !important;
+        }
+
+        .status-red {
+            background: linear-gradient(135deg, #f56565, #e53e3e) !important;
+            color: white !important;
+        }
+
+        .standard-info {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            background: #edf2f7;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .form-input {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .result-value {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .results-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">CALC DICOLUB</h1>
+            <p class="subtitle">Linha: 04</p>
+            <div class="info-box">
+                A cada 1 cm é igual a 2,350 kg
+            </div>
+        </div>
+
+        <form id="calculatorForm">
+            <div class="form-group">
+                <label class="form-label" for="cmInitial">Leitura inicial (cm)</label>
+                <input type="number" id="cmInitial" class="form-input" placeholder="Exemplo: 50.0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="cmFinal">Leitura final (cm)</label>
+                <input type="number" id="cmFinal" class="form-input" placeholder="Exemplo: 25.0" step="0.1">
+            </div>
+
+            <hr style="margin: 20px 0; border: 0; border-top: 4px solid #eee;">
+
+
+            <div class="form-group">
+                <label class="form-label" for="cmValue">Consumo (cm)</label>
+                <input type="number" id="cmValue" class="form-input" placeholder="Exemplo: 25,0" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="quantidadeLata">Produção envasada (uni)</label>
+                <input type="number" id="quantidadeLata" class="form-input" placeholder="Exemplo: 450670" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="volume">Volume do produto</label>
+                <input type="number" id="volume" class="form-input" placeholder="Exemplo: 0,300" step="0.1">
+            </div>
+        </form>
+
+        <div class="results-section">
+            <h2 class="results-title">Resultados dos Cálculos</h2>
+            
+            <div class="result-item">
+                <span class="result-label">Centímetro × 2.350</span>
+                <span class="result-value" id="step1Result">0</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">Resultado × 1000</span>
+                <span class="result-value" id="step2Result">0</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">Cálculo do dicolub</span>
+                <span class="result-value" id="dicoluberTotal">0</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">Volume em hectolitro (Qtd de grfs × Volume ÷ 100)</span>
+                <span class="result-value" id="vhlResult">0</span>
+            </div>
+
+            <div class="final-result" id="finalResult">
+                Resultado: 0 g/hl
+            </div>
+
+            <div class="standard-info">
+                Meta: 55,0 g/hl
+                <br>
+                <small>Verde: Abaixo da meta | Amarelo: Igual a meta | Vermelho: Acima da meta</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STANDARD_VALUE = 55.0;
+        const CONVERSION_FACTOR = 2.350;
+
+        // Elementos do DOM
+        const cmInitialInput = document.getElementById('cmInitial');
+        const cmFinalInput = document.getElementById('cmFinal');
+        const cmValueInput = document.getElementById('cmValue');
+        const quantidadeLataInput = document.getElementById('quantidadeLata');
+        const volumeInput = document.getElementById('volume');
+        
+        const step1ResultElement = document.getElementById('step1Result');
+        const step2ResultElement = document.getElementById('step2Result');
+        const dicoluberTotalElement = document.getElementById('dicoluberTotal');
+        const vhlResultElement = document.getElementById('vhlResult');
+        const finalResultElement = document.getElementById('finalResult');
+
+        // Função para formatar números
+        function formatNumber(num) {
+            if (isNaN(num) || !isFinite(num)) return '0';
+            return num.toLocaleString('pt-BR', { 
+                minimumFractionDigits: 1, 
+                maximumFractionDigits: 3 
+            });
+        }
+
+        // Função para atualizar o resultado final com cores
+        function updateFinalResult(result) {
+            const formattedResult = formatNumber(result);
+            finalResultElement.textContent = `Resultado: ${formattedResult} g/hl`;
+
+            // Remover classes de status anteriores
+            finalResultElement.classList.remove('status-green', 'status-yellow', 'status-red');
+
+            // Aplicar cor baseada na comparação com o padrão
+            if (result < STANDARD_VALUE) {
+                finalResultElement.classList.add('status-green');
+            } else if (Math.abs(result - STANDARD_VALUE) < 0.1) {
+                finalResultElement.classList.add('status-yellow');
+            } else {
+                finalResultElement.classList.add('status-red');
+            }
+        }
+
+        // Função para atualizar o campo Valor em CM
+        function updateCmValue() {
+            const cmInitialVal = cmInitialInput.value.trim();
+            const cmFinalVal = cmFinalInput.value.trim();
+
+            // Se ambos os campos inicial e final estão preenchidos
+            if (cmInitialVal !== "" && cmFinalVal !== "") {
+                const cmInitial = parseFloat(cmInitialVal.replace(",", "."));
+                const cmFinal = parseFloat(cmFinalVal.replace(",", "."));
+                
+                if (!isNaN(cmInitial) && !isNaN(cmFinal)) {
+                    const difference = Math.abs(cmInitial - cmFinal);
+                    cmValueInput.value = difference.toFixed(1);
+                    cmValueInput.readOnly = true;
+                    cmValueInput.style.backgroundColor = "#f0f0f0";
+                    return difference;
+                }
+            }
+            
+            // Se um ou ambos os campos estão vazios, permitir entrada manual
+            cmValueInput.readOnly = false;
+            cmValueInput.style.backgroundColor = "#f7fafc";
+            
+            // Retornar o valor manual ou 0
+            const manualValue = parseFloat(cmValueInput.value.replace(",", "."));
+            return isNaN(manualValue) ? 0 : manualValue;
+        }
+
+        // Função principal de cálculo
+        function calculate() {
+            // Atualizar e obter o valor em CM
+            const cmValue = updateCmValue();
+
+            const quantidadeLata = parseFloat(quantidadeLataInput.value) || 0;
+            const volume = parseFloat(volumeInput.value) || 0;
+
+            // Passo 1: CM × 2.350
+            const step1 = cmValue * CONVERSION_FACTOR;
+            step1ResultElement.textContent = formatNumber(step1);
+
+            // Passo 2: Resultado × 1000
+            const step2 = step1 * 1000;
+            step2ResultElement.textContent = formatNumber(step2);
+
+            // Dicoluber Total
+            const dicoluberTotal = step2;
+            dicoluberTotalElement.textContent = formatNumber(dicoluberTotal);
+
+            // V-HL: (Quantidade de lata × Volume) ÷ 100
+            const vhl = (quantidadeLata * volume) / 100;
+            vhlResultElement.textContent = formatNumber(vhl);
+
+            // Resultado Final: Dicoluber ÷ V-HL
+            let finalResult = 0;
+            if (vhl !== 0) {
+                finalResult = dicoluberTotal / vhl;
+            }
+
+            // Atualizar resultado final com cor
+            updateFinalResult(finalResult);
+        }
+
+        // Event listeners para cálculo automático
+        cmInitialInput.addEventListener('input', function() {
+            calculate();
+        });
+        
+        cmFinalInput.addEventListener('input', function() {
+            calculate();
+        });
+        
+        cmValueInput.addEventListener('input', function() {
+            // Se o usuário está digitando manualmente, não recalcular automaticamente
+            // apenas executar o cálculo final
+            if (!cmValueInput.readOnly) {
+                calculate();
+            }
+        });
+        
+        // Limpar campos CM quando um dos campos inicial/final for limpo
+        cmInitialInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                cmValueInput.value = '';
+            }
+        });
+        
+        cmFinalInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                cmValueInput.value = '';
+            }
+        });
+        
+        quantidadeLataInput.addEventListener('input', calculate);
+        volumeInput.addEventListener('input', calculate);
+
+        // Cálculo inicial
+        calculate();
+    </script>
+</body>
+</html>

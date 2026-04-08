@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicolub - Calculadora Reversa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .results-section {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .results-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 8px 15px;
+            border-radius: 8px;
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .form-input {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .result-value {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .results-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">CALC DICOLUB</h1>
+            <p class="subtitle">Calculadora Reversa de CM Consumido</p>
+        </div>
+
+        <form id="reverseCalculatorForm">
+            <div class="form-group">
+                <label class="form-label" for="producaoEnvasada">Produção Envasada</label>
+                <input type="number" id="producaoEnvasada" class="form-input" placeholder="Ex: 154704" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="ghl">g/hl</label>
+                <input type="number" id="ghl" class="form-input" placeholder="Ex: 1.78" step="0.01">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="volume">Volume</label>
+                <input type="number" id="volume" class="form-input" placeholder="Ex: 0,473" step="0.01">
+            </div>
+        </form>
+
+        <div class="results-section">
+            <h2 class="results-title">Resultado</h2>
+            <div class="result-item">
+                <span class="result-label">CM Consumido</span>
+                <span class="result-value" id="cmConsumidoResult">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const producaoEnvasadaInput = document.getElementById('producaoEnvasada');
+        const ghlInput = document.getElementById('ghl');
+        const volumeInput = document.getElementById('volume');
+        const cmConsumidoResultElement = document.getElementById('cmConsumidoResult');
+
+        function formatNumber(num) {
+            if (isNaN(num) || !isFinite(num)) return '0';
+            return num.toLocaleString('pt-BR', { 
+                minimumFractionDigits: 1, 
+                maximumFractionDigits: 3 
+            });
+        }
+
+        function calculateReverse() {
+            const producaoEnvasada = parseFloat(producaoEnvasadaInput.value.replace(',', '.')) || 0;
+            const ghl = parseFloat(ghlInput.value.replace(',', '.')) || 0;
+            const volume = parseFloat(volumeInput.value.replace(',', '.')) || 0;
+
+            let cmConsumido = 0;
+
+            if (producaoEnvasada > 0 && ghl > 0 && volume > 0) {
+                // 1. Calcular o Dicoluber Total
+                const dicoluberTotal = (ghl * producaoEnvasada * volume) / 100;
+
+                // 2. Calcular o CM Consumido (Dicoluber Total / 2.350)
+                // O fator 2.350 é o CONVERSION_FACTOR da calculadora original
+                if (2.350 !== 0) {
+                    cmConsumido = dicoluberTotal / 2.350;
+                }
+            }
+            cmConsumidoResultElement.textContent = formatNumber(cmConsumido);
+        }
+
+        producaoEnvasadaInput.addEventListener('input', calculateReverse);
+        ghlInput.addEventListener('input', calculateReverse);
+        volumeInput.addEventListener('input', calculateReverse);
+
+        calculateReverse(); // Initial calculation
+    </script>
+</body>
+</html>

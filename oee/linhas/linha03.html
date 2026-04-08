@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CALC OEE</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      text-align: left;
+      /* 🔥 força tudo alinhado à esquerda */
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      margin-top: 12px;
+      display: block;
+      font-weight: 500;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    select,
+    option {
+      font-weight: bold;
+    }
+
+    .result {
+      margin-top: 15px;
+      background: #334155;
+      padding: 12px;
+      border-radius: 8px;
+      line-height: 1.6;
+    }
+
+    .highlight {
+      font-size: 18px;
+      font-weight: bold;
+      color: #38bdf8;
+      display: block;
+      /* 🔥 quebra linha e alinha bonito */
+      margin-top: 2px;
+    }
+
+    /* 🔻 RODAPÉ */
+    footer {
+      text-align: center;
+      padding: 6px;
+      font-size: 12px;
+      color: #64748b;
+      border-top: 1px solid #334155;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>Calculadora do OEE</h2>
+
+    <label>Hora Inicial</label>
+    <input type="time" id="inicio">
+
+    <label>Hora Final</label>
+    <input type="time" id="fim">
+
+    <div class="result">
+      Tempo em Horas:
+      <span id="tempo" class="highlight">-</span>
+
+      Total em Minutos:
+      <span id="minutos" class="highlight">-</span>
+    </div>
+
+    <label>Nominal</label>
+    <select id="tipo">
+    <option value="35000">350 ml (35.000)</option>
+    <option value="35000">473 ml (35.000)</option>
+  </select>
+
+    <div class="result">
+      Nominal / 60:
+      <span id="div60" class="highlight">-</span>
+
+      Produção 100%:
+      <span id="maxProd" class="highlight">-</span>
+    </div>
+
+    <label>Produção Real</label>
+    <input type="number" id="producao" placeholder="Ex: 106000">
+
+    <div class="result">
+      OEE (%):
+      <span id="oe" class="highlight">-</span>
+    </div>
+  </div>
+
+  <footer>
+    Desenvolvido por Régis
+  </footer>
+
+  <script>
+    function calcular() {
+  const inicio = document.getElementById("inicio").value;
+  const fim = document.getElementById("fim").value;
+  const base = parseFloat(document.getElementById("tipo").value) || 0;
+  const producao = parseFloat(document.getElementById("producao").value) || 0;
+
+  if (!inicio || !fim) return;
+
+  const [h1, m1] = inicio.split(":").map(Number);
+  const [h2, m2] = fim.split(":").map(Number);
+
+  let inicioMin = h1 * 60 + m1;
+  let fimMin = h2 * 60 + m2;
+
+  if (fimMin < inicioMin) fimMin += 24 * 60;
+
+  const totalMin = fimMin - inicioMin;
+
+  const horas = Math.floor(totalMin / 60);
+  const minutos = totalMin % 60;
+
+  document.getElementById("tempo").innerText = `${horas}h ${minutos}min`;
+  document.getElementById("minutos").innerText = totalMin;
+
+  const div60 = base / 60;
+  document.getElementById("div60").innerText = div60.toFixed(2);
+
+  const maxProd = totalMin * div60;
+  document.getElementById("maxProd").innerText = maxProd.toFixed(2);
+
+  if (producao > 0 && maxProd > 0) {
+    const oe = (producao / maxProd) * 100;
+    document.getElementById("oe").innerText = oe.toFixed(2) + "%";
+  }
+}
+
+document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("input", calcular);
+});
+  </script>
+
+</body>
+
+</html>

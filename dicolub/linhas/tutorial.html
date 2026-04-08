@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: Calculadora Linha 06</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2d3748;
+        }
+        h2 {
+            font-size: 1.8em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        h3 {
+            font-size: 1.4em;
+            margin-top: 20px;
+        }
+        p {
+            margin-bottom: 10px;
+        }
+        .step {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 5px solid #4299e1;
+        }
+        .step strong {
+            color: #2d3748;
+        }
+        .code-block {
+            background: #edf2f7;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        .highlight-green {
+            color: #38a169;
+            font-weight: bold;
+        }
+        .highlight-yellow {
+            color: #dd6b20;
+            font-weight: bold;
+        }
+        .highlight-red {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 5px solid #ffeeba;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #856404;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+            h3 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Como usar a Calculadora Dicolub</h1>
+        <p>Bem-vindo ao tutorial da calculadora DICOLUB das linhas do envase. Esta ferramenta foi desenvolvida para auxiliar no cálculo preciso do consumo de lubrificante de esteiras, garantindo a eficiência e o controle do processo.</p>
+        <p>Siga os passos abaixo para utilizar a calculadora de forma eficaz:</p>
+
+        <h2>1. Entendendo os Campos de Entrada</h2>
+        <div class="step">
+            <h3>Centímetro inicial e Centímetro final</h3>
+            <p>Estes campos são usados para determinar o consumo em centímetro. Insira o valor do estoque inicial e o estoque final ou por turno em horarios dermarcado, valor final da medição em centímetro. A calculadora subtrairá automaticamente o valor inicial do final para obter o <strong>Consumo em centímetro</strong>.</p>
+            <p><strong>Exemplo:</strong> Se o Centímetro inicial for <code>50.0</code> e o Centímetro final for <code>48.0</code>, o Consumo em centímetro será <code>2.0</code>.</p>
+        </div>
+
+        <div class="step">
+            <h3>Consumo em centímetro</h3>
+            <p>Este campo é preenchido automaticamente com base nos valores de <strong>Centímetro inicial</strong> e <strong>Centímetro final</strong>. No entanto, se você não tiver os valores inicial e final, pode inserir o consumo em centímetro diretamente neste campo.</p>
+            <p class="note"><strong>Nota:</strong> Se você preencher o Centímetro inicial e Final, este campo será somente leitura. Se deixá-los em branco, poderá digitar o valor manualmente.</p>
+        </div>
+
+        <div class="step">
+            <h3>Produção envasada</h3>
+            <p>Insira aqui a quantidade total de produção envasada (em unidades, por exemplo, latas, garrafas ou pet).</p>
+            <p><strong>Exemplo:</strong> <code>150890</code></p>
+        </div>
+
+        <div class="step">
+            <h3>Volume do produto</h3>
+            <p>Informe o volume do produto envasado.</p>
+            <p><strong>Exemplo:</strong> <code>0,473</code></p>
+        </div>
+
+        <h2>2. Entendendo os Cálculos e Resultados</h2>
+        <p>A calculadora realiza uma série de cálculos internos para chegar ao resultado final. Veja como funciona:</p>
+
+        <div class="step">
+            <h3>Centímetro × 2.350 kl/g</h3>
+            <p>Este é o primeiro passo do cálculo. O valor inserido ou calculado no campo <strong>Consumo em centímetro</strong> é multiplicado por uma constante de <code>2.350</code>.</p>
+            <p><strong>Fórmula:</strong> <code>Consumo em centímetro × 2.350</code></p>
+            <p>O resultado é exibido como <strong>Centímetro × 2.350</strong>.</p>
+        </div>
+
+        <div class="step">
+            <h3>Resultado × 1000 (Cálculo do Dicolub)</h3>
+            <p>O resultado do passo anterior (<strong>Centímetro × 2.350</strong>) é então multiplicado por <code>1000</code>.</p>
+            <p><strong>Fórmula:</strong> <code>(Consumo em centímetro × 2.350) × 1000</code></p>
+            <p>Este valor é o <strong>Cálculo do Dicolub</strong>.</p>
+        </div>
+
+        <div class="step">
+            <h3>Volume em hectolitro (V-HL)</h3>
+            <p>Este cálculo determina o volume total em hectolitros com base na sua produção envasada e no volume do produto.</p>
+            <p><strong>Fórmula:</strong> <code>(Produção envasada × Volume do produto) ÷ 100</code></p>
+            <p>O resultado é exibido como <strong>Volume em hectolitro (Qtd de produto envasado × Volume ÷ 100)</strong>.</p>
+        </div>
+
+        <div class="step">
+            <h3>Resultado Final: Consumo em g/hl</h3>
+            <p>O resultado final é obtido dividindo o <strong>Cálculo do Dicolub</strong> pelo <strong>Volume em hectolitro (V-HL)</strong>.</p>
+            <p><strong>Fórmula:</strong> <code>Cálculo do Dicolub ÷ Volume em hectolitro (V-HL)</code></p>
+            <p>Este é o valor do consumo de lubrificante em gramas por hectolitro (g/hl).</p>
+        </div>
+
+        <div class="step">
+        <h2>3. Sistema de Cores da Meta</h2>
+        <p>O resultado final é comparado com a meta <strong></strong> e o sistema de cores indica o status:</p>
+        <ul>
+            <li><span class="highlight-green">Verde:</span> O resultado está <strong>abaixo da meta</strong>. Indica um consumo eficiente.</li>
+            <li><span class="highlight-yellow">Amarelo:</span> O resultado está <strong>igual à meta</strong> (ou muito próximo). Indica que o consumo está dentro</li>
+            <li><span class="highlight-red">Vermelho:</span> O resultado está <strong>acima da meta</strong>. Indica um consumo elevado que pode precisar de atenção.</li>
+        </ul>
+        <p>Esperamos que este tutorial ajude você a utilizar a calculadora DICOLUB com confiança e precisão!</p>
+    </div>
+</body>
+</html>
+
+
+
+       
