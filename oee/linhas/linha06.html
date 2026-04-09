@@ -1,115 +1,177 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALCULADORA OEE</title>
-    <meta property="og:title" content="CALC OEE">
-    <meta property="og:description" content="Calculadora para calcular OEE">
-    <meta property="og:image" content="https://i.ibb.co/LX7pFhP1/Sem-t-dddtulo.png">
-    <meta property="og:url" content="https://dev-regis.github.io/calc-dicolub.github.io/">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CALC OEE</title>
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      padding: 20px;
+      margin: 0;
+    }
 
-        /* Tela de boas-vindas */
-        .welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 1;
-            transition: opacity 0.8s ease-out;
-        }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      text-align: left;
+      /* 🔥 força tudo alinhado à esquerda */
+    }
 
-        .welcome-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-        .welcome-text {
-            color: white;
-            text-align: center;
-            animation: zoomIn 1.5s ease-out;
-        }
+    label {
+      margin-top: 12px;
+      display: block;
+      font-weight: 500;
+    }
 
-        .welcome-title {
-            font-size: 3.5rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
 
-        .welcome-subtitle {
-            font-size: 2.5rem;
-            font-weight: 300;
-            letter-spacing: 3px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+    select,
+    option {
+      font-weight: bold;
+    }
 
-        @keyframes zoomIn {
-            0% {
-                transform: scale(0.3);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
+    .result {
+      margin-top: 15px;
+      background: #334155;
+      padding: 12px;
+      border-radius: 8px;
+      line-height: 1.6;
+    }
 
-        /* Conteúdo principal */
-        .main-content {
-            opacity: 0;
-            transition: opacity 0.8s ease-in;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    .highlight {
+      font-size: 18px;
+      font-weight: bold;
+      color: #38bdf8;
+      display: block;
+      /* 🔥 quebra linha e alinha bonito */
+      margin-top: 2px;
+    }
 
-        .main-content.visible {
-            opacity: 1;
-        }
+    /* 🔻 RODAPÉ */
+    footer {
+      text-align: center;
+      padding: 6px;
+      font-size: 12px;
+      color: #64748b;
+      border-top: 1px solid #334155;
+      margin-top: 15px;
+    }
+  </style>
+</head>
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+<body>
 
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-            animation: slideDown 1s ease-out 0.5s both;
-        }
+  <div class="container">
+    <h2>Calculadora do OEE</h2>
 
-        .header h1 {
-            font-size: 3rem;
-            color: white;
+    <label>Hora Inicial</label>
+    <input type="time" id="inicio">
+
+    <label>Hora Final</label>
+    <input type="time" id="fim">
+
+    <div class="result">
+      Tempo em Horas:
+      <span id="tempo" class="highlight">-</span>
+
+      Total em Minutos:
+      <span id="minutos" class="highlight">-</span>
+    </div>
+
+    <label>Nominal</label>
+    <select id="tipo">
+    <option value="20000">2000 ml (20.000)</option>
+  </select>
+
+    <div class="result">
+      Nominal / 60:
+      <span id="div60" class="highlight">-</span>
+
+      Produção 100%:
+      <span id="maxProd" class="highlight">-</span>
+    </div>
+
+    <label>Produção Real</label>
+    <input type="number" id="producao" placeholder="Ex: 106000">
+
+    <div class="result">
+      OEE (%):
+      <span id="oe" class="highlight">-</span>
+    </div>
+  </div>
+
+  <footer>
+    Desenvolvido por Régis
+  </footer>
+
+  <script>
+    function calcular() {
+  const inicio = document.getElementById("inicio").value;
+  const fim = document.getElementById("fim").value;
+  const base = parseFloat(document.getElementById("tipo").value) || 0;
+  const producao = parseFloat(document.getElementById("producao").value) || 0;
+
+  if (!inicio || !fim) return;
+
+  const [h1, m1] = inicio.split(":").map(Number);
+  const [h2, m2] = fim.split(":").map(Number);
+
+  let inicioMin = h1 * 60 + m1;
+  let fimMin = h2 * 60 + m2;
+
+  if (fimMin < inicioMin) fimMin += 24 * 60;
+
+  const totalMin = fimMin - inicioMin;
+
+  const horas = Math.floor(totalMin / 60);
+  const minutos = totalMin % 60;
+
+  document.getElementById("tempo").innerText = `${horas}h ${minutos}min`;
+  document.getElementById("minutos").innerText = totalMin;
+
+  const div60 = base / 60;
+  document.getElementById("div60").innerText = div60.toFixed(2);
+
+  const maxProd = totalMin * div60;
+  document.getElementById("maxProd").innerText = maxProd.toFixed(2);
+
+  if (producao > 0 && maxProd > 0) {
+    const oe = (producao / maxProd) * 100;
+    document.getElementById("oe").innerText = oe.toFixed(2) + "%";
+  }
+}
+
+document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("input", calcular);
+});
+  </script>
+
+</body>
+
+</html>            color: white;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             margin-bottom: 10px;
         }
