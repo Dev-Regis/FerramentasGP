@@ -7,7 +7,7 @@
 
 <style>
 * {
-  box-sizing: border-box; /* 🔥 resolve estouro */
+  box-sizing: border-box;
 }
 
 body {
@@ -19,12 +19,12 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 15px; /* 🔥 respiro lateral no celular */
+  padding: 15px;
 }
 
 .container {
   width: 100%;
-  max-width: 380px; /* 🔥 limite seguro */
+  max-width: 380px;
   background: #1e293b;
   padding: 18px;
   border-radius: 12px;
@@ -73,23 +73,16 @@ select, option {
 .negativo { color: #ef4444; }
 
 .buttons {
-  display: flex;
-  gap: 10px;
   margin-top: 15px;
 }
 
 button {
-  flex: 1;
+  width: 100%;
   padding: 10px;
   border: none;
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-}
-
-.salvar {
-  background: #22c55e;
-  color: #000;
 }
 
 .limpar {
@@ -140,8 +133,7 @@ footer {
   </div>
 
   <div class="buttons">
-    <button class="salvar" onclick="salvar()">Salvar</button>
-    <button class="limpar" onclick="limpar()">Limpar</button>
+    <button class="limpar" onclick="limpar()">Limpar Contadores</button>
   </div>
 
   <footer>Desenvolvido por Régis</footer>
@@ -180,44 +172,54 @@ function calcular() {
   }
 }
 
+// 🔥 SALVAMENTO AUTOMÁTICO
+function salvarAutomatico() {
+  const dados = {
+    produto: produtoEl.value,
+    manual: manualEl.value
+  };
+  localStorage.setItem("producao_auto", JSON.stringify(dados));
+}
+
+// 🔥 AO MUDAR PRODUTO
 produtoEl.addEventListener("change", () => {
   manualBox.style.display = produtoEl.value ? "none" : "block";
+  salvarAutomatico();
   calcular();
 });
 
-function salvar() {
-  const dados = {
-    produto: produtoEl.value,
-    manual: manualEl.value,
-    cInicial: document.getElementById("cInicial").value,
-    cFinal: document.getElementById("cFinal").value
-  };
-  localStorage.setItem("producao", JSON.stringify(dados));
-  alert("Salvo!");
-}
+// 🔥 AO DIGITAR MANUAL
+manualEl.addEventListener("input", () => {
+  salvarAutomatico();
+  calcular();
+});
 
+// 🔥 CARREGAR DADOS
 function carregar() {
-  const dados = JSON.parse(localStorage.getItem("producao"));
+  const dados = JSON.parse(localStorage.getItem("producao_auto"));
   if (!dados) return;
 
   produtoEl.value = dados.produto;
   manualEl.value = dados.manual;
-  document.getElementById("cInicial").value = dados.cInicial;
-  document.getElementById("cFinal").value = dados.cFinal;
 
   manualBox.style.display = produtoEl.value ? "none" : "block";
-  calcular();
 }
 
+// 🔥 LIMPAR SOMENTE CONTADORES
 function limpar() {
-  localStorage.removeItem("producao");
-  location.reload();
+  document.getElementById("cInicial").value = "";
+  document.getElementById("cFinal").value = "";
+  document.getElementById("real").innerText = "-";
+  document.getElementById("dif").innerText = "-";
+  document.getElementById("percent").innerText = "-";
 }
 
-document.querySelectorAll("input").forEach(el => {
+// EVENTOS
+document.querySelectorAll("#cInicial, #cFinal").forEach(el => {
   el.addEventListener("input", calcular);
 });
 
+// INICIAR
 carregar();
 </script>
 
