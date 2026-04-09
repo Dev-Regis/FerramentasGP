@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Produção</title>
+
+<style>
+* {
+  box-sizing: border-box; /* 🔥 resolve estouro */
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #fff;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px; /* 🔥 respiro lateral no celular */
+}
+
+.container {
+  width: 100%;
+  max-width: 380px; /* 🔥 limite seguro */
+  background: #1e293b;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+}
+
+select, option {
+  font-weight: bold;
+}
+
+.result {
+  margin-top: 15px;
+  background: #334155;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.highlight {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 4px;
+  color: #38bdf8;
+}
+
+.positivo { color: #22c55e; }
+.negativo { color: #ef4444; }
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.salvar {
+  background: #22c55e;
+  color: #000;
+}
+
+.limpar {
+  background: #ef4444;
+  color: #fff;
+}
+
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Controle de Produção</h2>
+
+  <label>Produto</label>
+  <select id="produto">
+    <option value="">Selecionar produto</option>
+    <option value="45000">300 ml (45.000)</option>
+  </select>
+
+  <div id="manualBox">
+    <label>Valor Manual da Caixa</label>
+    <input type="number" id="manual" placeholder="Ex: 45000">
+  </div>
+
+  <label>Contador Inicial</label>
+  <input type="number" id="cInicial">
+
+  <label>Contador Final</label>
+  <input type="number" id="cFinal">
+
+  <div class="result">
+    Real Rotulado:
+    <span id="real" class="highlight">-</span>
+
+    Diferença:
+    <span id="dif" class="highlight">-</span>
+
+    Percentual (%):
+    <span id="percent" class="highlight">-</span>
+  </div>
+
+  <div class="buttons">
+    <button class="salvar" onclick="salvar()">Salvar</button>
+    <button class="limpar" onclick="limpar()">Limpar</button>
+  </div>
+
+  <footer>Desenvolvido por Régis</footer>
+</div>
+
+<script>
+const produtoEl = document.getElementById("produto");
+const manualBox = document.getElementById("manualBox");
+const manualEl = document.getElementById("manual");
+
+function calcular() {
+  let produto = produtoEl.value ? parseFloat(produtoEl.value) : parseFloat(manualEl.value) || 0;
+
+  const cInicial = parseFloat(document.getElementById("cInicial").value) || 0;
+  const cFinal = parseFloat(document.getElementById("cFinal").value) || 0;
+
+  if (cFinal > 0) {
+    const real = cFinal - cInicial;
+    document.getElementById("real").innerText = real;
+
+    const diferenca = real - produto;
+    const difEl = document.getElementById("dif");
+
+    if (diferenca >= 0) {
+      difEl.innerText = "+ " + diferenca;
+      difEl.className = "highlight positivo";
+    } else {
+      difEl.innerText = diferenca;
+      difEl.className = "highlight negativo";
+    }
+
+    if (produto > 0) {
+      const perc = (diferenca * 100) / produto;
+      document.getElementById("percent").innerText = perc.toFixed(2) + "%";
+    }
+  }
+}
+
+produtoEl.addEventListener("change", () => {
+  manualBox.style.display = produtoEl.value ? "none" : "block";
+  calcular();
+});
+
+function salvar() {
+  const dados = {
+    produto: produtoEl.value,
+    manual: manualEl.value,
+    cInicial: document.getElementById("cInicial").value,
+    cFinal: document.getElementById("cFinal").value
+  };
+  localStorage.setItem("producao", JSON.stringify(dados));
+  alert("Salvo!");
+}
+
+function carregar() {
+  const dados = JSON.parse(localStorage.getItem("producao"));
+  if (!dados) return;
+
+  produtoEl.value = dados.produto;
+  manualEl.value = dados.manual;
+  document.getElementById("cInicial").value = dados.cInicial;
+  document.getElementById("cFinal").value = dados.cFinal;
+
+  manualBox.style.display = produtoEl.value ? "none" : "block";
+  calcular();
+}
+
+function limpar() {
+  localStorage.removeItem("producao");
+  location.reload();
+}
+
+document.querySelectorAll("input").forEach(el => {
+  el.addEventListener("input", calcular);
+});
+
+carregar();
+</script>
+
+</body>
+</html>
