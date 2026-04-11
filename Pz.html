@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronômetro Inteligente</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #fff;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.container {
+  width: 100%;
+  max-width: 380px;
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.timer {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #38bdf8;
+}
+
+.seconds {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.result {
+  margin-top: 15px;
+  background: #334155;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.highlight {
+  font-size: 20px;
+  font-weight: bold;
+  color: #22c55e;
+  display: block;
+  margin-top: 5px;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.play {
+  background: #22c55e;
+  color: #000;
+}
+
+.stop {
+  background: #facc15;
+  color: #000;
+}
+
+.clear {
+  background: #ef4444;
+  color: #fff;
+}
+
+footer {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #64748b;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Cronômetro</h2>
+
+  <div class="timer" id="timer">00:00</div>
+  <div class="seconds" id="seconds">0 segundos</div>
+
+  <div class="result">
+    Resultado:
+    <span id="resultado" class="highlight">-</span>
+  </div>
+
+  <div class="buttons">
+    <button id="btnPlay" class="play">PLAY</button>
+    <button class="clear" onclick="limpar()">LIMPAR</button>
+  </div>
+
+  <footer>Desenvolvido por Régis</footer>
+</div>
+
+<script>
+let intervalo = null;
+let segundos = 0;
+let rodando = false;
+
+const timerEl = document.getElementById("timer");
+const secondsEl = document.getElementById("seconds");
+const resultadoEl = document.getElementById("resultado");
+const btnPlay = document.getElementById("btnPlay");
+
+// FORMATA TEMPO
+function formatarTempo(seg) {
+  const m = Math.floor(seg / 60);
+  const s = seg % 60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// 🔥 CALCULO CORRETO
+function calcularResultado() {
+  const valor = (segundos / 0.81) * 18 / 60;
+  resultadoEl.innerText = valor.toFixed(2);
+}
+
+// ATUALIZA TELA
+function atualizar() {
+  timerEl.innerText = formatarTempo(segundos);
+  secondsEl.innerText = segundos + " segundos";
+  calcularResultado();
+}
+
+// PLAY / STOP
+btnPlay.onclick = () => {
+  if (!rodando) {
+    rodando = true;
+    btnPlay.innerText = "STOP";
+    btnPlay.className = "stop";
+
+    intervalo = setInterval(() => {
+      segundos++;
+      atualizar();
+      salvar();
+    }, 1000);
+
+  } else {
+    rodando = false;
+    btnPlay.innerText = "PLAY";
+    btnPlay.className = "play";
+    clearInterval(intervalo);
+  }
+};
+
+// SALVAR
+function salvar() {
+  localStorage.setItem("cronometro", segundos);
+}
+
+// CARREGAR
+function carregar() {
+  const salvo = localStorage.getItem("cronometro");
+  if (salvo) {
+    segundos = parseInt(salvo);
+    atualizar();
+  }
+}
+
+// LIMPAR
+function limpar() {
+  segundos = 0;
+  rodando = false;
+  clearInterval(intervalo);
+  btnPlay.innerText = "PLAY";
+  btnPlay.className = "play";
+  resultadoEl.innerText = "-";
+  localStorage.removeItem("cronometro");
+  atualizar();
+}
+
+// INICIAR
+carregar();
+atualizar();
+</script>
+
+</body>
+</html>
