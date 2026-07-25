@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1f2d49">
+  <title>Calculadora de DBL</title>
+
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg:#1f2d49;
+      --panel:#425776;
+      --panel-2:#354965;
+      --input:#ececee;
+      --input-text:#151922;
+      --text:#f8f6f2;
+      --muted:#c0cada;
+      --accent:#c591ff;
+      --focus:#91acd2;
+      --danger:#ff9c9c;
+      --radius:13px;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html{
+      -webkit-text-size-adjust:100%;
+    }
+
+    body{
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    .page{
+      width:min(100%, 410px);
+      margin:0 auto;
+      padding:12px 12px 16px;
+    }
+
+    h1{
+      text-align:center;
+      font-size:clamp(1.45rem, 6vw, 1.95rem);
+      line-height:1.15;
+      margin-bottom:14px;
+      letter-spacing:-0.02em;
+    }
+
+    .field{
+      margin-bottom:10px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:5px;
+      font-size:.98rem;
+      font-weight:500;
+      line-height:1.2;
+      color:var(--text);
+    }
+
+    input, select{
+      width:100%;
+      height:46px;
+      border:0;
+      border-radius:var(--radius);
+      outline:none;
+      background:var(--input);
+      color:var(--input-text);
+      font:inherit;
+      font-size:.92rem;
+      box-shadow:inset 0 0 0 2px transparent;
+      transition:box-shadow .18s ease;
+    }
+
+    input{
+      padding:0 11px;
+    }
+
+    input::placeholder{
+      color:#81858d;
+    }
+
+    select{
+      padding:0 34px 0 11px;
+      appearance:none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #333 50%),
+        linear-gradient(135deg, #333 50%, transparent 50%);
+      background-position:
+        calc(100% - 17px) 20px,
+        calc(100% - 11px) 20px;
+      background-size:6px 6px, 6px 6px;
+      background-repeat:no-repeat;
+    }
+
+    input:focus, select:focus{
+      box-shadow:inset 0 0 0 2px var(--focus);
+    }
+
+    input.invalid, select.invalid{
+      box-shadow:inset 0 0 0 2px var(--danger);
+    }
+
+    .info{
+      margin-top:5px;
+      color:var(--muted);
+      font-size:.74rem;
+      line-height:1.35;
+    }
+
+    .cols{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .error{
+      min-height:16px;
+      margin:-1px 0 6px;
+      color:var(--danger);
+      font-size:.76rem;
+      line-height:1.35;
+    }
+
+    .results{
+      display:grid;
+      gap:10px;
+    }
+
+    .card{
+      padding:14px;
+      border-radius:16px;
+      background:var(--panel);
+    }
+
+    .ct{
+      margin-bottom:8px;
+      font-size:.98rem;
+      font-weight:500;
+    }
+
+    .cv{
+      margin-bottom:7px;
+      font-size:clamp(1.2rem, 6.6vw, 1.65rem);
+      font-weight:800;
+      line-height:1.05;
+      overflow-wrap:anywhere;
+    }
+
+    .accent{
+      color:var(--accent);
+    }
+
+    .desc{
+      color:var(--muted);
+      font-size:.78rem;
+      line-height:1.35;
+    }
+
+    .break{
+      display:grid;
+      gap:4px;
+      margin-top:8px;
+      padding-top:8px;
+      border-top:1px solid rgba(255,255,255,.12);
+      color:var(--muted);
+      font-size:.74rem;
+      line-height:1.35;
+    }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .row strong{
+      color:var(--text);
+      text-align:right;
+      font-weight:700;
+    }
+
+    .actions{
+      margin-top:12px;
+    }
+
+    button{
+      width:100%;
+      height:46px;
+      border:0;
+      border-radius:14px;
+      background:var(--panel-2);
+      color:var(--text);
+      font:inherit;
+      font-size:.95rem;
+      font-weight:700;
+      cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    button:active{
+      transform:scale(.99);
+    }
+
+    .note{
+      margin-top:8px;
+      text-align:center;
+      color:var(--muted);
+      font-size:.72rem;
+      line-height:1.35;
+    }
+
+    @media (max-width: 360px){
+      .page{
+        padding:12px 10px 16px;
+      }
+
+      .cols{
+        gap:8px;
+      }
+
+      input, select{
+        height:44px;
+        font-size:.88rem;
+      }
+
+      .card{
+        padding:12px;
+      }
+
+      .cv{
+        font-size:1.15rem;
+      }
+
+      .desc{
+        font-size:.74rem;
+      }
+
+      .break{
+        font-size:.7rem;
+      }
+
+      button{
+        height:42px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Calculadora de DBL</h1>
+
+    <div class="field">
+      <label for="bruta">Produção bruta</label>
+      <input id="bruta" type="text" inputmode="decimal" autocomplete="off" placeholder="150000">
+    </div>
+
+    <div class="field">
+      <label for="produto">Produto</label>
+      <select id="produto">
+        <option data-caixas="72">300 ml</option>
+        <option data-caixas="49">600 ml Ret</option>
+        <option data-caixas="35">600 ml Desc</option>
+      </select>
+      <p class="info" id="info"></p>
+    </div>
+
+    <div class="cols">
+      <div class="field">
+        <label for="paletes">Paletes</label>
+        <input id="paletes" type="text" inputmode="numeric" autocomplete="off" placeholder="150">
+      </div>
+
+      <div class="field">
+        <label for="fracao">Fração</label>
+        <input id="fracao" type="text" inputmode="numeric" autocomplete="off" placeholder="2">
+      </div>
+    </div>
+
+    <div class="error" id="erro" role="alert" aria-live="polite"></div>
+
+    <section class="results" aria-live="polite">
+      <article class="card">
+        <div class="ct">Diferença</div>
+        <div class="cv" id="diferenca">0</div>
+        <div class="desc">Produção bruta − Total de garrafas</div>
+
+        <div class="break">
+          <div class="row">
+            <span>Caixas dos paletes</span>
+            <strong id="cxPaletes">0</strong>
+          </div>
+          <div class="row">
+            <span>Caixas da fração</span>
+            <strong id="cxFracao">0</strong>
+          </div>
+          <div class="row">
+            <span>Total de caixas</span>
+            <strong id="cxTotal">0</strong>
+          </div>
+          <div class="row">
+            <span>Total de garrafas</span>
+            <strong id="garrafas">0</strong>
+          </div>
+          <div class="row">
+            <span>Garrafas por caixa</span>
+            <strong>24</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="ct">Dbl</div>
+        <div class="cv accent" id="dbl">0,00%</div>
+        <div class="desc">(A diferença ÷ Produção bruta) × 100</div>
+      </article>
+    </section>
+
+    <div class="actions">
+      <button id="limpar" type="button">Limpar</button>
+      <p class="note">O cálculo é atualizado automaticamente enquanto você digita.</p>
+    </div>
+  </main>
+
+  <script>
+    "use strict";
+
+    const GPC = 24;
+    const $ = (id) => document.getElementById(id);
+
+    const bruta = $("bruta");
+    const produto = $("produto");
+    const paletes = $("paletes");
+    const fracao = $("fracao");
+    const info = $("info");
+    const erro = $("erro");
+
+    const cxPaletes = $("cxPaletes");
+    const cxFracao = $("cxFracao");
+    const cxTotal = $("cxTotal");
+    const garrafas = $("garrafas");
+    const diferenca = $("diferenca");
+    const dbl = $("dbl");
+    const limpar = $("limpar");
+
+    const fmtInt = new Intl.NumberFormat("pt-BR", {
+      maximumFractionDigits: 0
+    });
+
+    const fmtPct = new Intl.NumberFormat("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    function num(v) {
+      let t = String(v).trim().replace(/\s/g, "");
+      if (!t) return NaN;
+
+      if (t.includes(",") && t.includes(".")) {
+        t = t.replace(/\./g, "").replace(",", ".");
+      } else if (t.includes(",")) {
+        t = t.replace(",", ".");
+      }
+
+      return Number(t.replace(/[^0-9.-]/g, ""));
+    }
+
+    function inteiro(v) {
+      const n = num(v);
+      return Number.isFinite(n) ? Math.trunc(n) : NaN;
+    }
+
+    function caixasPalete() {
+      return Number(produto.options[produto.selectedIndex].dataset.caixas);
+    }
+
+    function produtoInfo() {
+      const c = caixasPalete();
+      info.textContent = `1 palete = ${c} caixas · 1 caixa = ${GPC} garrafas`;
+      fracao.placeholder = `0 a ${c - 1}`;
+    }
+
+    function invalido(el, v) {
+      el.classList.toggle("invalid", v);
+      el.setAttribute("aria-invalid", String(v));
+    }
+
+    function zerar() {
+      cxPaletes.textContent = "0";
+      cxFracao.textContent = "0";
+      cxTotal.textContent = "0";
+      garrafas.textContent = "0";
+      diferenca.textContent = "0";
+      dbl.textContent = "0,00%";
+    }
+
+    function calcular() {
+      const b = num(bruta.value);
+      const p = inteiro(paletes.value);
+      const f = inteiro(fracao.value);
+      const cpp = caixasPalete();
+
+      const brutaVazia = !bruta.value.trim();
+      const paletesVazio = !paletes.value.trim();
+      const fracaoVazia = !fracao.value.trim();
+
+      erro.textContent = "";
+      [bruta, paletes, fracao].forEach((e) => invalido(e, false));
+
+      if (brutaVazia && paletesVazio && fracaoVazia) {
+        zerar();
+        return;
+      }
+
+      if (!brutaVazia && (!Number.isFinite(b) || b <= 0)) {
+        erro.textContent = "A produção bruta deve ser maior que zero.";
+        invalido(bruta, true);
+        zerar();
+        return;
+      }
+
+      if (!paletesVazio && (!Number.isFinite(p) || p < 0)) {
+        erro.textContent = "A quantidade de paletes deve ser um número inteiro igual ou maior que zero.";
+        invalido(paletes, true);
+        zerar();
+        return;
+      }
+
+      if (!fracaoVazia && (!Number.isFinite(f) || f < 0)) {
+        erro.textContent = "A fração deve ser um número inteiro igual ou maior que zero.";
+        invalido(fracao, true);
+        zerar();
+        return;
+      }
+
+      const qp = paletesVazio ? 0 : p;
+      const qf = fracaoVazia ? 0 : f;
+
+      if (qf >= cpp) {
+        erro.textContent = `A fração deve ter no máximo ${cpp - 1} caixas para este produto.`;
+        invalido(fracao, true);
+        zerar();
+        return;
+      }
+
+      const cp = qp * cpp;
+      const ct = cp + qf;
+      const tg = ct * GPC;
+
+      cxPaletes.textContent = fmtInt.format(cp);
+      cxFracao.textContent = fmtInt.format(qf);
+      cxTotal.textContent = fmtInt.format(ct);
+      garrafas.textContent = fmtInt.format(tg);
+
+      if (!brutaVazia && b > 0) {
+        const dif = b - tg;
+        diferenca.textContent = fmtInt.format(dif);
+        dbl.textContent = fmtPct.format((dif / b) * 100) + "%";
+      } else {
+        diferenca.textContent = "0";
+        dbl.textContent = "0,00%";
+      }
+    }
+
+    [bruta, paletes, fracao].forEach((e) => {
+      e.addEventListener("input", calcular);
+    });
+
+    produto.addEventListener("change", () => {
+      produtoInfo();
+      calcular();
+    });
+
+    limpar.addEventListener("click", () => {
+      bruta.value = "";
+      paletes.value = "";
+      fracao.value = "";
+      produto.selectedIndex = 0;
+      erro.textContent = "";
+      [bruta, paletes, fracao].forEach((e) => invalido(e, false));
+      produtoInfo();
+      zerar();
+      bruta.focus();
+    });
+
+    produtoInfo();
+    zerar();
+  </script>
+</body>
+</html>

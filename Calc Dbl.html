@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1f2d49">
+  <title>Seleção de Linha</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #1f2d49;
+      --panel: #354965;
+      --panel-hover: #425a7b;
+      --text: #f8f6f2;
+      --muted: #bcc7d8;
+      --accent: #c591ff;
+      --accent-dark: #8155bd;
+      --border: rgba(255, 255, 255, 0.10);
+      --shadow: 0 18px 45px rgba(8, 15, 29, 0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background:
+        radial-gradient(circle at top, rgba(197, 145, 255, 0.10), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    .app {
+      width: min(100%, 430px);
+      padding: 20px 16px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(42, 58, 82, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .title {
+      text-align: center;
+      font-size: clamp(1.45rem, 7vw, 2rem);
+      line-height: 1.15;
+      margin-bottom: 7px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.4;
+      margin-bottom: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .line-button {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--text);
+      background: var(--panel);
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition:
+        transform 0.16s ease,
+        background 0.16s ease,
+        border-color 0.16s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .line-button:hover {
+      background: var(--panel-hover);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .line-button:active {
+      transform: scale(0.98);
+    }
+
+    .line-button.active {
+      border-color: var(--border);
+      background: var(--panel);
+      box-shadow: none;
+    }
+
+
+
+    @media (max-width: 360px) {
+      body {
+        padding: 10px;
+      }
+
+      .app {
+        padding: 16px 12px;
+        border-radius: 18px;
+      }
+
+      .grid {
+        gap: 8px;
+      }
+
+      .line-button {
+        min-height: 56px;
+        border-radius: 14px;
+        font-size: 0.94rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <h1 class="title">Selecione a Linha</h1>
+    <p class="subtitle">Escolha uma linha para abrir a ferramenta correspondente.</p>
+
+    <section class="grid" aria-label="Linhas de produção">
+      <button class="line-button placeholder" type="button" data-line="Linha 1">Linha 1</button>
+      <button class="line-button placeholder" type="button" data-line="Linha 2">Linha 2</button>
+      <button class="line-button placeholder" type="button" data-line="Linha 3">Linha 3</button>
+
+      <a class="line-button active" href="linha4.html" aria-label="Abrir ferramenta da Linha 4">
+        Linha 4
+      </a>
+
+      <button class="line-button placeholder" type="button" data-line="Linha 5">Linha 5</button>
+      <button class="line-button placeholder" type="button" data-line="Linha 6">Linha 6</button>
+    </section>
+
+  </main>
+
+</body>
+</html>
