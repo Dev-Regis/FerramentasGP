@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#090d16" id="themeColorMeta">
+  <title>Calendário até 2099</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070a11;
+      --bg-soft: #0c111d;
+      --card: rgba(17, 23, 38, .94);
+      --card-strong: #151c2d;
+      --text: #f7f9ff;
+      --muted: #8f9ab2;
+      --line: rgba(255, 255, 255, .08);
+      --accent: #7c6cff;
+      --accent-2: #36d6c2;
+      --accent-soft: rgba(124, 108, 255, .15);
+      --today-ring: #8a7cff;
+      --holiday: #ff6f91;
+      --holiday-soft: rgba(255, 111, 145, .14);
+      --weekend: #ff9aaf;
+      --shadow: 0 18px 55px rgba(0, 0, 0, .32);
+      --radius: 22px;
+      --header-h: 146px;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --bg: #eef2f8;
+      --bg-soft: #f7f9fc;
+      --card: rgba(255, 255, 255, .96);
+      --card-strong: #ffffff;
+      --text: #11182a;
+      --muted: #69758d;
+      --line: rgba(15, 27, 50, .09);
+      --accent: #5a4bea;
+      --accent-2: #0da68f;
+      --accent-soft: rgba(90, 75, 234, .11);
+      --today-ring: #5a4bea;
+      --holiday: #d73867;
+      --holiday-soft: rgba(215, 56, 103, .10);
+      --weekend: #c6315e;
+      --shadow: 0 18px 50px rgba(34, 48, 78, .12);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 15% -10%, rgba(124,108,255,.22), transparent 31%),
+        radial-gradient(circle at 105% 8%, rgba(54,214,194,.13), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: background .25s ease, color .25s ease;
+    }
+
+    button, select, input { font: inherit; }
+
+    button {
+      border: 0;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(100%, 540px);
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding-bottom: calc(30px + env(safe-area-inset-bottom));
+      position: relative;
+    }
+
+    .topbar {
+      position: sticky;
+      z-index: 20;
+      top: 0;
+      padding: calc(12px + env(safe-area-inset-top)) 14px 10px;
+      background: linear-gradient(to bottom, var(--bg) 72%, transparent);
+      backdrop-filter: blur(14px);
+    }
+
+    .title-row,
+    .year-controls,
+    .month-card__head,
+    .legend,
+    .sheet-head,
+    .detail-line,
+    .custom-form {
+      display: flex;
+      align-items: center;
+    }
+
+    .title-row {
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 2px 12px;
+    }
+
+    .eyebrow {
+      margin: 0 0 3px;
+      color: var(--accent-2);
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.38rem, 6vw, 1.78rem);
+      line-height: 1.05;
+      letter-spacing: -.045em;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      font-size: 1.1rem;
+    }
+
+    .year-controls {
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .year-controls .nav-btn {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      font-size: 1.28rem;
+      font-weight: 900;
+    }
+
+    .year-select-wrap {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+    }
+
+    #yearSelect {
+      width: 100%;
+      height: 40px;
+      appearance: none;
+      border: 0;
+      outline: 0;
+      border-radius: 12px;
+      padding: 0 34px 0 12px;
+      background: var(--bg-soft);
+      color: var(--text);
+      text-align: center;
+      font-weight: 850;
+    }
+
+    .year-select-wrap::after {
+      content: "⌄";
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      pointer-events: none;
+      color: var(--muted);
+    }
+
+    .today-btn {
+      height: 40px;
+      padding: 0 13px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #6354e8);
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .month-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 2px 14px 12px;
+      scroll-padding: 14px;
+    }
+
+    .month-strip::-webkit-scrollbar { display: none; }
+
+    .month-chip {
+      flex: 0 0 auto;
+      min-width: 68px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 800;
+    }
+
+    .month-chip.active {
+      border-color: transparent;
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(124,108,255,.28);
+    }
+
+    main {
+      padding: 0 14px;
+    }
+
+    .summary {
+      margin: 2px 0 14px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, var(--accent-soft), transparent 55%),
+        var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .summary-title {
+      margin: 0;
+      font-size: .98rem;
+      font-weight: 900;
+      letter-spacing: -.02em;
+    }
+
+    .summary-sub {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: .76rem;
+      line-height: 1.5;
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .insight-card {
+      min-width: 0;
+      min-height: 72px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--bg-soft);
+    }
+
+    .insight-card.wide {
+      grid-column: 1 / -1;
+      min-height: 64px;
+    }
+
+    .insight-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: .61rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .insight-icon {
+      font-size: .9rem;
+      line-height: 1;
+    }
+
+    .insight-value {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: .78rem;
+      font-weight: 880;
+      line-height: 1.3;
+    }
+
+    .location-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 9px;
+      padding: 8px 9px 8px 11px;
+      border: 1px dashed var(--line);
+      border-radius: 13px;
+      color: var(--muted);
+      font-size: .64rem;
+      font-weight: 750;
+    }
+
+    .location-label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .location-btn {
+      flex: 0 0 auto;
+      padding: 7px 9px;
+      border-radius: 9px;
+      background: var(--accent-soft);
+      color: var(--text);
+      font-size: .63rem;
+      font-weight: 900;
+    }
+
+    .location-btn:disabled {
+      opacity: .55;
+      cursor: default;
+    }
+
+    .legend {
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: .68rem;
+      font-weight: 700;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--holiday);
+    }
+
+    .legend-today {
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--today-ring);
+      border-radius: 999px;
+    }
+
+    .calendar-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .month-card {
+      scroll-margin-top: calc(var(--header-h) + env(safe-area-inset-top));
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .month-card.current-month {
+      border-color: rgba(124, 108, 255, .52);
+      box-shadow: 0 18px 55px rgba(81, 67, 190, .16);
+    }
+
+    .month-card__head {
+      justify-content: space-between;
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .month-name {
+      margin: 0;
+      font-size: 1.13rem;
+      font-weight: 900;
+      letter-spacing: -.035em;
+      text-transform: capitalize;
+    }
+
+    .month-meta {
+      color: var(--muted);
+      font-size: .69rem;
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 28px repeat(7, minmax(0, 1fr));
+      padding: 9px 8px 12px;
+    }
+
+    .weekday,
+    .week-label {
+      min-height: 25px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: .62rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .week-label {
+      border-right: 1px solid var(--line);
+      color: var(--accent-2);
+    }
+
+    .weekday.weekend { color: var(--weekend); }
+
+    .week-number {
+      min-height: 49px;
+      display: grid;
+      place-items: center;
+      border-right: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .62rem;
+      font-weight: 900;
+    }
+
+    .day {
+      position: relative;
+      min-width: 0;
+      min-height: 49px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 4px 1px 1px;
+      border-radius: 13px;
+      background: transparent;
+      user-select: none;
+    }
+
+    .day:active { transform: scale(.94); }
+
+    .day.outside { opacity: .26; }
+
+    .day.weekend .day-number { color: var(--weekend); }
+
+    .day-number {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: var(--text);
+      font-size: .78rem;
+      font-weight: 800;
+    }
+
+    .day.today .day-number {
+      border: 2px solid var(--today-ring);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 4px rgba(124,108,255,.08);
+      color: var(--text);
+    }
+
+    .day.holiday {
+      background: linear-gradient(to bottom, var(--holiday-soft), transparent);
+    }
+
+    .day.holiday .day-number {
+      color: var(--holiday);
+      font-weight: 950;
+    }
+
+    .day.today.holiday .day-number {
+      color: var(--text);
+    }
+
+    .day-markers {
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      transform: translateX(-50%);
+    }
+
+    .holiday-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--holiday);
+    }
+
+    .event-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--accent-2);
+    }
+
+    .moon-marker {
+      position: absolute;
+      right: 0;
+      top: 1px;
+      font-size: .58rem;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,.22));
+    }
+
+    .footer-note {
+      margin: 18px 5px 0;
+      color: var(--muted);
+      font-size: .68rem;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .backdrop {
+      position: fixed;
+      z-index: 60;
+      inset: 0;
+      display: none;
+      background: rgba(0,0,0,.54);
+      backdrop-filter: blur(6px);
+    }
+
+    .backdrop.open { display: block; }
+
+    .sheet {
+      position: fixed;
+      z-index: 70;
+      left: 50%;
+      bottom: 0;
+      width: min(100%, 540px);
+      max-height: min(78dvh, 650px);
+      overflow: auto;
+      padding: 11px 16px calc(18px + env(safe-area-inset-bottom));
+      border: 1px solid var(--line);
+      border-bottom: 0;
+      border-radius: 26px 26px 0 0;
+      background: var(--card-strong);
+      box-shadow: 0 -18px 70px rgba(0,0,0,.35);
+      transform: translate(-50%, 110%);
+      transition: transform .28s ease;
+    }
+
+    .sheet.open { transform: translate(-50%, 0); }
+
+    .grabber {
+      width: 40px;
+      height: 4px;
+      margin: 0 auto 13px;
+      border-radius: 999px;
+      background: var(--line);
+    }
+
+    .sheet-head {
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .sheet-title {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 950;
+      letter-spacing: -.035em;
+      text-transform: capitalize;
+    }
+
+    .sheet-date {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: .76rem;
+    }
+
+    .close-btn {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--bg-soft);
+      color: var(--muted);
+      font-size: 1.05rem;
+      font-weight: 900;
+    }
+
+    .details {
+      display: grid;
+      gap: 9px;
+      margin-top: 15px;
+    }
+
+    .detail-line {
+      align-items: flex-start;
+      gap: 11px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--bg-soft);
+    }
+
+    .detail-icon {
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--accent-soft);
+    }
+
+    .detail-label {
+      margin: 0 0 2px;
+      color: var(--muted);
+      font-size: .66rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+
+    .detail-value {
+      margin: 0;
+      font-size: .82rem;
+      line-height: 1.42;
+      font-weight: 780;
+    }
+
+    .custom-box {
+      margin-top: 14px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--bg-soft);
+    }
+
+    .custom-box h3 {
+      margin: 0 0 9px;
+      font-size: .82rem;
+    }
+
+    .custom-form { gap: 8px; }
+
+    #eventInput {
+      min-width: 0;
+      flex: 1;
+      height: 42px;
+      border: 1px solid var(--line);
+      outline: none;
+      border-radius: 12px;
+      padding: 0 12px;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    #eventInput:focus { border-color: var(--accent); }
+
+    .save-event {
+      height: 42px;
+      padding: 0 13px;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 850;
+    }
+
+    .event-list {
+      display: grid;
+      gap: 7px;
+      margin-top: 9px;
+    }
+
+    .saved-event {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 9px 8px 11px;
+      border-radius: 11px;
+      background: var(--card);
+      color: var(--text);
+      font-size: .76rem;
+      font-weight: 700;
+    }
+
+    .delete-event {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--holiday-soft);
+      color: var(--holiday);
+      font-weight: 900;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 100;
+      left: 50%;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      max-width: calc(100% - 32px);
+      padding: 11px 15px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--card-strong);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      font-size: .76rem;
+      font-weight: 800;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 18px);
+      transition: .22s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (min-width: 541px) {
+      body::before {
+        content: "Este calendário foi projetado para tela de celular.";
+        position: fixed;
+        z-index: -1;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: transparent;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="title-row">
+        <div>
+          <p class="eyebrow">Brasil • 1900–2099</p>
+          <h1 id="appTitle">Calendário 2026</h1>
+        </div>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="Alternar tema" title="Alternar tema">☀️</button>
+      </div>
+
+      <div class="year-controls">
+        <button class="nav-btn" id="prevYear" type="button" aria-label="Ano anterior">‹</button>
+        <div class="year-select-wrap">
+          <select id="yearSelect" aria-label="Selecionar ano"></select>
+        </div>
+        <button class="nav-btn" id="nextYear" type="button" aria-label="Próximo ano">›</button>
+        <button class="today-btn" id="todayBtn" type="button">Hoje</button>
+      </div>
+    </header>
+
+    <nav class="month-strip" id="monthStrip" aria-label="Meses do ano"></nav>
+
+    <main>
+      <section class="summary">
+        <p class="summary-title" id="summaryTitle">Hoje</p>
+        <p class="summary-sub" id="summarySub"></p>
+
+        <div class="insights-grid" aria-label="Informações de hoje">
+          <div class="insight-card">
+            <div class="insight-top"><span class="insight-icon">♈</span> Signo</div>
+            <p class="insight-value" id="insightZodiac">—</p>
+          </div>
+          <div class="insight-card">
+            <div class="insight-top"><span class="insight-icon">🍂</span> Estação</div>
+            <p class="insight-value" id="insightSeason">—</p>
+          </div>
+          <div class="insight-card">
+            <div class="insight-top"><span class="insight-icon">💼</span> Dias úteis</div>
+            <p class="insight-value" id="insightBusiness">—</p>
+          </div>
+          <div class="insight-card">
+            <div class="insight-top"><span class="insight-icon">📆</span> Dia do ano</div>
+            <p class="insight-value" id="insightYearDay">—</p>
+          </div>
+          <div class="insight-card wide">
+            <div class="insight-top"><span class="insight-icon">🌅</span> Nascer e pôr do sol</div>
+            <p class="insight-value" id="insightSun">—</p>
+          </div>
+        </div>
+
+        <div class="location-row">
+          <span class="location-label" id="locationLabel">📍 São Paulo (padrão)</span>
+          <button class="location-btn" id="locationBtn" type="button">Usar meu local</button>
+        </div>
+
+        <div class="legend" aria-label="Legenda">
+          <span><i class="legend-today"></i> Dia atual</span>
+          <span><i class="legend-dot"></i> Feriado/data especial</span>
+          <span>🌑 Fase principal da Lua</span>
+          <span><b style="color:var(--accent-2)">S</b> Nº da semana</span>
+        </div>
+      </section>
+
+      <section class="calendar-list" id="calendarList" aria-live="polite"></section>
+
+      <p class="footer-note">
+        Inclui feriados nacionais brasileiros, datas móveis tradicionais e pontos facultativos comuns.
+        Feriados estaduais e municipais variam por localidade; você pode acrescentá-los tocando no dia.
+        As fases lunares, signos, estações, dias úteis e posição do dia no ano são calculados no aparelho.
+        O nascer e o pôr do sol usam a localização autorizada pelo celular ou São Paulo como referência.
+      </p>
+    </main>
+  </div>
+
+  <div class="backdrop" id="backdrop"></div>
+
+  <aside class="sheet" id="daySheet" aria-hidden="true" aria-label="Detalhes do dia">
+    <div class="grabber"></div>
+    <div class="sheet-head">
+      <div>
+        <h2 class="sheet-title" id="sheetTitle">Dia</h2>
+        <p class="sheet-date" id="sheetDate"></p>
+      </div>
+      <button class="close-btn" id="closeSheet" type="button" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="details" id="details"></div>
+
+    <div class="custom-box">
+      <h3>Adicionar feriado local ou lembrete</h3>
+      <form class="custom-form" id="eventForm">
+        <input id="eventInput" maxlength="60" autocomplete="off" placeholder="Ex.: Aniversário da cidade">
+        <button class="save-event" type="submit">Salvar</button>
+      </form>
+      <div class="event-list" id="eventList"></div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const MIN_YEAR = 1900;
+      const MAX_YEAR = 2099;
+      const STORAGE_THEME = "calendario2099_tema";
+      const STORAGE_EVENTS = "calendario2099_eventos";
+      const STORAGE_LOCATION = "calendario2099_localizacao";
+      const memoryStorage = {};
+      const storage = {
+        getItem(key) {
+          try { return window.localStorage.getItem(key); }
+          catch { return Object.prototype.hasOwnProperty.call(memoryStorage, key) ? memoryStorage[key] : null; }
+        },
+        setItem(key, value) {
+          try { window.localStorage.setItem(key, value); }
+          catch { memoryStorage[key] = String(value); }
+        }
+      };
+
+      const monthNames = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+      ];
+      const shortMonths = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+      const weekDays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+
+      const now = new Date();
+      const safeCurrentYear = Math.min(MAX_YEAR, Math.max(MIN_YEAR, now.getFullYear()));
+      const DEFAULT_LOCATION = {
+        lat: -23.5505,
+        lon: -46.6333,
+        label: "São Paulo (padrão)"
+      };
+
+      let displayedYear = safeCurrentYear;
+      let selectedDate = null;
+      let observer = null;
+      let toastTimer = null;
+      let activeLocation = loadStoredLocation() || { ...DEFAULT_LOCATION };
+
+      const appTitle = document.getElementById("appTitle");
+      const themeBtn = document.getElementById("themeBtn");
+      const yearSelect = document.getElementById("yearSelect");
+      const prevYear = document.getElementById("prevYear");
+      const nextYear = document.getElementById("nextYear");
+      const todayBtn = document.getElementById("todayBtn");
+      const monthStrip = document.getElementById("monthStrip");
+      const calendarList = document.getElementById("calendarList");
+      const summaryTitle = document.getElementById("summaryTitle");
+      const summarySub = document.getElementById("summarySub");
+      const insightZodiac = document.getElementById("insightZodiac");
+      const insightSeason = document.getElementById("insightSeason");
+      const insightBusiness = document.getElementById("insightBusiness");
+      const insightYearDay = document.getElementById("insightYearDay");
+      const insightSun = document.getElementById("insightSun");
+      const locationLabel = document.getElementById("locationLabel");
+      const locationBtn = document.getElementById("locationBtn");
+      const backdrop = document.getElementById("backdrop");
+      const daySheet = document.getElementById("daySheet");
+      const closeSheet = document.getElementById("closeSheet");
+      const sheetTitle = document.getElementById("sheetTitle");
+      const sheetDate = document.getElementById("sheetDate");
+      const details = document.getElementById("details");
+      const eventForm = document.getElementById("eventForm");
+      const eventInput = document.getElementById("eventInput");
+      const eventList = document.getElementById("eventList");
+      const toast = document.getElementById("toast");
+      const themeColorMeta = document.getElementById("themeColorMeta");
+
+      function pad(value) {
+        return String(value).padStart(2, "0");
+      }
+
+      function keyOf(date) {
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      }
+
+      function dateAtNoon(year, month, day) {
+        return new Date(year, month, day, 12, 0, 0, 0);
+      }
+
+      function sameDate(a, b) {
+        return a && b &&
+          a.getFullYear() === b.getFullYear() &&
+          a.getMonth() === b.getMonth() &&
+          a.getDate() === b.getDate();
+      }
+
+      function addDays(date, amount) {
+        const result = new Date(date);
+        result.setDate(result.getDate() + amount);
+        return result;
+      }
+
+      function formatLong(date) {
+        return new Intl.DateTimeFormat("pt-BR", {
+          weekday: "long",
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        }).format(date);
+      }
+
+      function isLeapYear(year) {
+        return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+      }
+
+      function dayOfYear(date) {
+        const start = dateAtNoon(date.getFullYear(), 0, 1);
+        return Math.floor((dateAtNoon(date.getFullYear(), date.getMonth(), date.getDate()) - start) / 86400000) + 1;
+      }
+
+      function zodiacInfo(date) {
+        const value = (date.getMonth() + 1) * 100 + date.getDate();
+        const signs = [
+          { from: 120, to: 218, name: "Aquário", icon: "♒" },
+          { from: 219, to: 320, name: "Peixes", icon: "♓" },
+          { from: 321, to: 419, name: "Áries", icon: "♈" },
+          { from: 420, to: 520, name: "Touro", icon: "♉" },
+          { from: 521, to: 620, name: "Gêmeos", icon: "♊" },
+          { from: 621, to: 722, name: "Câncer", icon: "♋" },
+          { from: 723, to: 822, name: "Leão", icon: "♌" },
+          { from: 823, to: 922, name: "Virgem", icon: "♍" },
+          { from: 923, to: 1022, name: "Libra", icon: "♎" },
+          { from: 1023, to: 1121, name: "Escorpião", icon: "♏" },
+          { from: 1122, to: 1221, name: "Sagitário", icon: "♐" }
+        ];
+        return signs.find(sign => value >= sign.from && value <= sign.to) ||
+          { name: "Capricórnio", icon: "♑" };
+      }
+
+      function seasonInfo(date) {
+        const value = (date.getMonth() + 1) * 100 + date.getDate();
+        if (value >= 320 && value <= 620) return { name: "Outono", icon: "🍂" };
+        if (value >= 621 && value <= 921) return { name: "Inverno", icon: "❄️" };
+        if (value >= 922 && value <= 1220) return { name: "Primavera", icon: "🌸" };
+        return { name: "Verão", icon: "☀️" };
+      }
+
+      function businessDaysInMonth(year, month) {
+        const holidays = buildHolidays(year);
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        let total = 0;
+
+        for (let day = 1; day <= lastDay; day++) {
+          const date = dateAtNoon(year, month, day);
+          const weekday = date.getDay();
+          const isWeekday = weekday !== 0 && weekday !== 6;
+          const isNationalHoliday = (holidays.get(keyOf(date)) || [])
+            .some(item => item.type === "Feriado nacional");
+
+          if (isWeekday && !isNationalHoliday) total++;
+        }
+        return total;
+      }
+
+      function loadStoredLocation() {
+        try {
+          const saved = JSON.parse(storage.getItem(STORAGE_LOCATION) || "null");
+          if (
+            saved &&
+            Number.isFinite(saved.lat) &&
+            Number.isFinite(saved.lon) &&
+            Math.abs(saved.lat) <= 90 &&
+            Math.abs(saved.lon) <= 180
+          ) {
+            return {
+              lat: saved.lat,
+              lon: saved.lon,
+              label: saved.label || "Localização do celular"
+            };
+          }
+        } catch {}
+        return null;
+      }
+
+      function saveLocation(location) {
+        storage.setItem(STORAGE_LOCATION, JSON.stringify(location));
+      }
+
+      function showToast(message) {
+        clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.add("show");
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1900);
+      }
+
+      function getStoredEvents() {
+        try {
+          const value = JSON.parse(storage.getItem(STORAGE_EVENTS) || "{}");
+          return value && typeof value === "object" ? value : {};
+        } catch {
+          return {};
+        }
+      }
+
+      function saveStoredEvents(events) {
+        storage.setItem(STORAGE_EVENTS, JSON.stringify(events));
+      }
+
+      function applyTheme(theme) {
+        const useLight = theme === "light";
+        document.documentElement.dataset.theme = useLight ? "light" : "dark";
+        themeBtn.textContent = useLight ? "🌙" : "☀️";
+        themeBtn.title = useLight ? "Ativar tema escuro" : "Ativar tema claro";
+        themeColorMeta.setAttribute("content", useLight ? "#eef2f8" : "#090d16");
+        storage.setItem(STORAGE_THEME, useLight ? "light" : "dark");
+      }
+
+      function initTheme() {
+        const stored = storage.getItem(STORAGE_THEME);
+        applyTheme(stored === "light" ? "light" : "dark");
+      }
+
+      // Algoritmo gregoriano de Meeus/Jones/Butcher para o Domingo de Páscoa.
+      function easterSunday(year) {
+        const a = year % 19;
+        const b = Math.floor(year / 100);
+        const c = year % 100;
+        const d = Math.floor(b / 4);
+        const e = b % 4;
+        const f = Math.floor((b + 8) / 25);
+        const g = Math.floor((b - f + 1) / 3);
+        const h = (19 * a + b - d - g + 15) % 30;
+        const i = Math.floor(c / 4);
+        const k = c % 4;
+        const l = (32 + 2 * e + 2 * i - h - k) % 7;
+        const m = Math.floor((a + 11 * h + 22 * l) / 451);
+        const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+        const day = ((h + l - 7 * m + 114) % 31) + 1;
+        return dateAtNoon(year, month, day);
+      }
+
+      function buildHolidays(year) {
+        const map = new Map();
+
+        const add = (date, name, type = "Feriado nacional") => {
+          const key = keyOf(date);
+          if (!map.has(key)) map.set(key, []);
+          map.get(key).push({ name, type });
+        };
+
+        [
+          [0, 1, "Confraternização Universal"],
+          [3, 21, "Tiradentes"],
+          [4, 1, "Dia Mundial do Trabalho"],
+          [8, 7, "Independência do Brasil"],
+          [9, 12, "Nossa Senhora Aparecida"],
+          [10, 2, "Finados"],
+          [10, 15, "Proclamação da República"],
+          [10, 20, "Dia Nacional de Zumbi e da Consciência Negra"],
+          [11, 25, "Natal"]
+        ].forEach(([month, day, name]) => add(dateAtNoon(year, month, day), name));
+
+        const easter = easterSunday(year);
+        add(addDays(easter, -48), "Segunda-feira de Carnaval", "Ponto facultativo comum");
+        add(addDays(easter, -47), "Carnaval", "Ponto facultativo comum");
+        add(addDays(easter, -46), "Quarta-feira de Cinzas", "Ponto facultativo comum");
+        add(addDays(easter, -2), "Paixão de Cristo", "Data religiosa amplamente observada");
+        add(easter, "Domingo de Páscoa", "Data religiosa");
+        add(addDays(easter, 60), "Corpus Christi", "Ponto facultativo comum");
+
+        return map;
+      }
+
+      function isoWeek(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const day = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - day);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      }
+
+      // Cálculo lunar offline baseado em coordenadas solares/lunares de baixa precisão.
+      const rad = Math.PI / 180;
+      const dayMs = 86400000;
+      const J1970 = 2440588;
+      const J2000 = 2451545;
+      const e = rad * 23.4397;
+      const J0 = 0.0009;
+
+      function fromJulian(julian) {
+        return new Date((julian + 0.5 - J1970) * dayMs);
+      }
+
+      function julianCycle(days, lw) {
+        return Math.round(days - J0 - lw / (2 * Math.PI));
+      }
+
+      function approxTransit(hourAngleValue, lw, cycle) {
+        return J0 + (hourAngleValue + lw) / (2 * Math.PI) + cycle;
+      }
+
+      function solarTransitJulian(ds, meanAnomaly, eclipticLong) {
+        return J2000 + ds + 0.0053 * Math.sin(meanAnomaly) - 0.0069 * Math.sin(2 * eclipticLong);
+      }
+
+      function hourAngle(altitude, latitude, declinationValue) {
+        return Math.acos(
+          (Math.sin(altitude) - Math.sin(latitude) * Math.sin(declinationValue)) /
+          (Math.cos(latitude) * Math.cos(declinationValue))
+        );
+      }
+
+      function sunTimes(date, latitude = activeLocation.lat, longitude = activeLocation.lon) {
+        const lw = rad * -longitude;
+        const phi = rad * latitude;
+        const days = toDays(date);
+        const cycle = julianCycle(days, lw);
+        const ds = approxTransit(0, lw, cycle);
+        const meanAnomaly = solarMeanAnomaly(ds);
+        const eclipticLong = eclipticLongitude(meanAnomaly);
+        const declinationValue = declination(eclipticLong, 0);
+        const noonJulian = solarTransitJulian(ds, meanAnomaly, eclipticLong);
+        const angle = hourAngle(-0.833 * rad, phi, declinationValue);
+
+        if (!Number.isFinite(angle)) {
+          return { sunrise: null, sunset: null };
+        }
+
+        const setApprox = approxTransit(angle, lw, cycle);
+        const setJulian = solarTransitJulian(setApprox, meanAnomaly, eclipticLong);
+        const riseJulian = noonJulian - (setJulian - noonJulian);
+
+        return {
+          sunrise: fromJulian(riseJulian),
+          sunset: fromJulian(setJulian)
+        };
+      }
+
+      function formatClock(date) {
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "—";
+        return new Intl.DateTimeFormat("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit"
+        }).format(date);
+      }
+
+      function requestDeviceLocation(announce = true) {
+        if (!("geolocation" in navigator)) {
+          if (announce) showToast("Localização não disponível neste navegador");
+          return;
+        }
+
+        locationBtn.disabled = true;
+        locationBtn.textContent = "Localizando…";
+
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            activeLocation = {
+              lat: position.coords.latitude,
+              lon: position.coords.longitude,
+              label: "Localização do celular"
+            };
+            saveLocation(activeLocation);
+            updateTodayInsights();
+            if (selectedDate && daySheet.classList.contains("open")) openDay(selectedDate);
+            locationBtn.disabled = false;
+            locationBtn.textContent = "Atualizar local";
+            if (announce) showToast("Localização atualizada");
+          },
+          () => {
+            locationBtn.disabled = false;
+            locationBtn.textContent = "Usar meu local";
+            if (announce) showToast("Permissão negada. Usando São Paulo como referência");
+          },
+          {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 21600000
+          }
+        );
+      }
+
+      function updateTodayInsights() {
+        const zodiac = zodiacInfo(now);
+        const season = seasonInfo(now);
+        const solar = sunTimes(now);
+        const yearTotal = isLeapYear(now.getFullYear()) ? 366 : 365;
+
+        insightZodiac.textContent = `${zodiac.icon} ${zodiac.name}`;
+        insightSeason.textContent = `${season.icon} ${season.name}`;
+        insightBusiness.textContent = `${businessDaysInMonth(now.getFullYear(), now.getMonth())} em ${monthNames[now.getMonth()]}`;
+        insightYearDay.textContent = `Dia ${dayOfYear(now)} de ${yearTotal}`;
+        insightSun.textContent = `Nascer ${formatClock(solar.sunrise)} • Pôr ${formatClock(solar.sunset)}`;
+        locationLabel.textContent = `📍 ${activeLocation.label}`;
+        locationBtn.textContent = activeLocation.label === DEFAULT_LOCATION.label ? "Usar meu local" : "Atualizar local";
+      }
+
+      function toJulian(date) {
+        return date.valueOf() / dayMs - 0.5 + J1970;
+      }
+
+      function toDays(date) {
+        return toJulian(date) - J2000;
+      }
+
+      function rightAscension(l, b) {
+        return Math.atan2(Math.sin(l) * Math.cos(e) - Math.tan(b) * Math.sin(e), Math.cos(l));
+      }
+
+      function declination(l, b) {
+        return Math.asin(Math.sin(b) * Math.cos(e) + Math.cos(b) * Math.sin(e) * Math.sin(l));
+      }
+
+      function solarMeanAnomaly(d) {
+        return rad * (357.5291 + 0.98560028 * d);
+      }
+
+      function eclipticLongitude(M) {
+        const C = rad * (1.9148 * Math.sin(M) + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M));
+        const P = rad * 102.9372;
+        return M + C + P + Math.PI;
+      }
+
+      function sunCoords(d) {
+        const M = solarMeanAnomaly(d);
+        const L = eclipticLongitude(M);
+        return { dec: declination(L, 0), ra: rightAscension(L, 0) };
+      }
+
+      function moonCoords(d) {
+        const L = rad * (218.316 + 13.176396 * d);
+        const M = rad * (134.963 + 13.064993 * d);
+        const F = rad * (93.272 + 13.229350 * d);
+        const l = L + rad * 6.289 * Math.sin(M);
+        const b = rad * 5.128 * Math.sin(F);
+        const dt = 385001 - 20905 * Math.cos(M);
+        return { ra: rightAscension(l, b), dec: declination(l, b), dist: dt };
+      }
+
+      function moonIllumination(date) {
+        const d = toDays(date);
+        const s = sunCoords(d);
+        const m = moonCoords(d);
+        const sdist = 149598000;
+        const phi = Math.acos(
+          Math.sin(s.dec) * Math.sin(m.dec) +
+          Math.cos(s.dec) * Math.cos(m.dec) * Math.cos(s.ra - m.ra)
+        );
+        const inc = Math.atan2(sdist * Math.sin(phi), m.dist - sdist * Math.cos(phi));
+        const angle = Math.atan2(
+          Math.cos(s.dec) * Math.sin(s.ra - m.ra),
+          Math.sin(s.dec) * Math.cos(m.dec) -
+          Math.cos(s.dec) * Math.sin(m.dec) * Math.cos(s.ra - m.ra)
+        );
+        const phase = 0.5 + 0.5 * inc * (angle < 0 ? -1 : 1) / Math.PI;
+        return {
+          fraction: (1 + Math.cos(inc)) / 2,
+          phase: (phase + 1) % 1
+        };
+      }
+
+      const moonPhases = [
+        { max: 0.0625, name: "Lua nova", icon: "🌑" },
+        { max: 0.1875, name: "Lua crescente", icon: "🌒" },
+        { max: 0.3125, name: "Quarto crescente", icon: "🌓" },
+        { max: 0.4375, name: "Gibosa crescente", icon: "🌔" },
+        { max: 0.5625, name: "Lua cheia", icon: "🌕" },
+        { max: 0.6875, name: "Gibosa minguante", icon: "🌖" },
+        { max: 0.8125, name: "Quarto minguante", icon: "🌗" },
+        { max: 0.9375, name: "Lua minguante", icon: "🌘" },
+        { max: 1.0001, name: "Lua nova", icon: "🌑" }
+      ];
+
+      function moonPhaseInfo(date) {
+        const illumination = moonIllumination(date);
+        const info = moonPhases.find(item => illumination.phase < item.max) || moonPhases[0];
+        return {
+          ...info,
+          phase: illumination.phase,
+          illuminated: Math.round(illumination.fraction * 100)
+        };
+      }
+
+      function circularDistance(value, target) {
+        const direct = Math.abs(value - target);
+        return Math.min(direct, 1 - direct);
+      }
+
+      function majorMoonPhase(date) {
+        const targets = [
+          { value: 0, name: "Lua nova", icon: "🌑" },
+          { value: 0.25, name: "Quarto crescente", icon: "🌓" },
+          { value: 0.5, name: "Lua cheia", icon: "🌕" },
+          { value: 0.75, name: "Quarto minguante", icon: "🌗" }
+        ];
+
+        const phase = moonIllumination(date).phase;
+        const prev = moonIllumination(addDays(date, -1)).phase;
+        const next = moonIllumination(addDays(date, 1)).phase;
+
+        for (const target of targets) {
+          const here = circularDistance(phase, target.value);
+          if (
+            here <= circularDistance(prev, target.value) &&
+            here < circularDistance(next, target.value) &&
+            here < 0.028
+          ) {
+            return target;
+          }
+        }
+        return null;
+      }
+
+      function initYearSelect() {
+        const fragment = document.createDocumentFragment();
+        for (let year = MIN_YEAR; year <= MAX_YEAR; year++) {
+          const option = document.createElement("option");
+          option.value = year;
+          option.textContent = year;
+          fragment.appendChild(option);
+        }
+        yearSelect.appendChild(fragment);
+      }
+
+      function renderMonthStrip(activeMonth = null) {
+        monthStrip.innerHTML = "";
+        shortMonths.forEach((name, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "month-chip";
+          button.dataset.month = index;
+          button.textContent = name;
+          if (index === activeMonth) button.classList.add("active");
+          button.addEventListener("click", () => scrollToMonth(index));
+          monthStrip.appendChild(button);
+        });
+      }
+
+      function setActiveMonth(month) {
+        document.querySelectorAll(".month-chip").forEach((chip, index) => {
+          chip.classList.toggle("active", index === month);
+        });
+        const active = document.querySelector(`.month-chip[data-month="${month}"]`);
+        if (active) {
+          const targetLeft = active.offsetLeft - (monthStrip.clientWidth - active.offsetWidth) / 2;
+          monthStrip.scrollTo({ left: Math.max(0, targetLeft), behavior: "smooth" });
+        }
+      }
+
+      function getMonthWeeks(year, month) {
+        const first = dateAtNoon(year, month, 1);
+        const mondayOffset = (first.getDay() + 6) % 7;
+        const gridStart = addDays(first, -mondayOffset);
+        const weeks = [];
+        for (let row = 0; row < 6; row++) {
+          const rowStart = addDays(gridStart, row * 7);
+          const days = [];
+          for (let col = 0; col < 7; col++) days.push(addDays(rowStart, col));
+          weeks.push({ week: isoWeek(rowStart), days });
+        }
+
+        const lastWeek = weeks[weeks.length - 1];
+        const hasCurrentMonth = lastWeek.days.some(d => d.getMonth() === month);
+        if (!hasCurrentMonth) weeks.pop();
+        return weeks;
+      }
+
+      function monthHolidayCount(holidays, month) {
+        let count = 0;
+        holidays.forEach((items, key) => {
+          const parts = key.split("-").map(Number);
+          if (parts[1] - 1 === month) count += items.length;
+        });
+        return count;
+      }
+
+      function renderCalendar(year, options = {}) {
+        displayedYear = Math.min(MAX_YEAR, Math.max(MIN_YEAR, Number(year)));
+        yearSelect.value = displayedYear;
+        appTitle.textContent = `Calendário ${displayedYear}`;
+        prevYear.disabled = displayedYear <= MIN_YEAR;
+        nextYear.disabled = displayedYear >= MAX_YEAR;
+        prevYear.style.opacity = prevYear.disabled ? ".35" : "1";
+        nextYear.style.opacity = nextYear.disabled ? ".35" : "1";
+
+        const holidays = buildHolidays(displayedYear);
+        const customEvents = getStoredEvents();
+        calendarList.innerHTML = "";
+        renderMonthStrip(
+          displayedYear === now.getFullYear() ? now.getMonth() : (options.focusMonth ?? 0)
+        );
+
+        for (let month = 0; month < 12; month++) {
+          const card = document.createElement("article");
+          card.className = "month-card";
+          card.id = `month-${month}`;
+          card.dataset.month = month;
+
+          if (displayedYear === now.getFullYear() && month === now.getMonth()) {
+            card.classList.add("current-month");
+          }
+
+          const header = document.createElement("div");
+          header.className = "month-card__head";
+
+          const monthTitle = document.createElement("h2");
+          monthTitle.className = "month-name";
+          monthTitle.textContent = monthNames[month];
+
+          const meta = document.createElement("span");
+          meta.className = "month-meta";
+          const count = monthHolidayCount(holidays, month);
+          const businessDays = businessDaysInMonth(displayedYear, month);
+          meta.textContent = count
+            ? `${businessDays} úteis • ${count} data${count > 1 ? "s" : ""}`
+            : `${businessDays} dias úteis`;
+
+          header.append(monthTitle, meta);
+          card.appendChild(header);
+
+          const grid = document.createElement("div");
+          grid.className = "grid";
+
+          const weekHead = document.createElement("div");
+          weekHead.className = "week-label";
+          weekHead.textContent = "S";
+          weekHead.title = "Número da semana";
+          grid.appendChild(weekHead);
+
+          weekDays.forEach((name, index) => {
+            const weekday = document.createElement("div");
+            weekday.className = `weekday${index >= 5 ? " weekend" : ""}`;
+            weekday.textContent = name;
+            grid.appendChild(weekday);
+          });
+
+          const weeks = getMonthWeeks(displayedYear, month);
+          weeks.forEach(row => {
+            const weekNumber = document.createElement("div");
+            weekNumber.className = "week-number";
+            weekNumber.textContent = pad(row.week);
+            weekNumber.title = `Semana ${row.week}`;
+            grid.appendChild(weekNumber);
+
+            row.days.forEach(date => {
+              const key = keyOf(date);
+              const holidayItems = holidays.get(key) || [];
+              const userItems = customEvents[key] || [];
+              const moon = majorMoonPhase(date);
+              const inMonth = date.getMonth() === month && date.getFullYear() === displayedYear;
+              const weekend = date.getDay() === 0 || date.getDay() === 6;
+
+              const button = document.createElement("button");
+              button.type = "button";
+              button.className = "day";
+              if (!inMonth) button.classList.add("outside");
+              if (weekend) button.classList.add("weekend");
+              if (holidayItems.length) button.classList.add("holiday");
+              if (inMonth && sameDate(date, now)) button.classList.add("today");
+              button.dataset.date = key;
+              button.setAttribute("aria-label", formatLong(date));
+              button.title = [
+                formatLong(date),
+                ...holidayItems.map(item => item.name),
+                ...userItems,
+                moon ? moon.name : ""
+              ].filter(Boolean).join(" • ");
+
+              const number = document.createElement("span");
+              number.className = "day-number";
+              number.textContent = date.getDate();
+              button.appendChild(number);
+
+              if (moon) {
+                const moonEl = document.createElement("span");
+                moonEl.className = "moon-marker";
+                moonEl.textContent = moon.icon;
+                moonEl.title = moon.name;
+                button.appendChild(moonEl);
+              }
+
+              if (holidayItems.length || userItems.length) {
+                const markers = document.createElement("span");
+                markers.className = "day-markers";
+                if (holidayItems.length) {
+                  const dot = document.createElement("i");
+                  dot.className = "holiday-dot";
+                  markers.appendChild(dot);
+                }
+                if (userItems.length) {
+                  const dot = document.createElement("i");
+                  dot.className = "event-dot";
+                  markers.appendChild(dot);
+                }
+                button.appendChild(markers);
+              }
+
+              button.addEventListener("click", () => openDay(date));
+
+              if (!inMonth) {
+                button.addEventListener("click", () => {
+                  const targetYear = date.getFullYear();
+                  const targetMonth = date.getMonth();
+                  if (targetYear >= MIN_YEAR && targetYear <= MAX_YEAR && targetYear !== displayedYear) {
+                    setTimeout(() => {
+                      renderCalendar(targetYear, { focusMonth: targetMonth });
+                      requestAnimationFrame(() => scrollToMonth(targetMonth, false));
+                    }, 320);
+                  }
+                }, { once: true });
+              }
+
+              grid.appendChild(button);
+            });
+          });
+
+          card.appendChild(grid);
+          calendarList.appendChild(card);
+        }
+
+        setupMonthObserver();
+
+        const currentIsVisibleYear = displayedYear === now.getFullYear();
+        const todayMoon = moonPhaseInfo(now);
+        summaryTitle.textContent = `Hoje, ${now.getDate()} de ${monthNames[now.getMonth()]}`;
+        summarySub.textContent =
+          `${formatLong(now)} • Semana ${isoWeek(now)} • ${todayMoon.icon} ${todayMoon.name}, ` +
+          `${todayMoon.illuminated}% iluminada.` +
+          (currentIsVisibleYear ? "" : ` • Visualizando o calendário de ${displayedYear}.`);
+
+        updateTodayInsights();
+
+        const focus = options.focusMonth;
+        if (typeof focus === "number") {
+          requestAnimationFrame(() => scrollToMonth(focus, false));
+        }
+      }
+
+      function setupMonthObserver() {
+        observer?.disconnect();
+        observer = new IntersectionObserver(entries => {
+          const visible = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (visible) setActiveMonth(Number(visible.target.dataset.month));
+        }, {
+          rootMargin: "-175px 0px -55% 0px",
+          threshold: [0.08, 0.25, 0.5]
+        });
+
+        document.querySelectorAll(".month-card").forEach(card => observer.observe(card));
+      }
+
+      function scrollToMonth(month, smooth = true) {
+        const card = document.getElementById(`month-${month}`);
+        card?.scrollIntoView({
+          behavior: smooth ? "smooth" : "auto",
+          block: "start"
+        });
+        setActiveMonth(month);
+      }
+
+      function detailItem(icon, label, value) {
+        const line = document.createElement("div");
+        line.className = "detail-line";
+        line.innerHTML = `
+          <div class="detail-icon">${icon}</div>
+          <div>
+            <p class="detail-label">${label}</p>
+            <p class="detail-value"></p>
+          </div>
+        `;
+        line.querySelector(".detail-value").textContent = value;
+        return line;
+      }
+
+      function renderEventList() {
+        eventList.innerHTML = "";
+        if (!selectedDate) return;
+
+        const events = getStoredEvents();
+        const key = keyOf(selectedDate);
+        const items = events[key] || [];
+
+        if (!items.length) {
+          const empty = document.createElement("div");
+          empty.style.cssText = "color:var(--muted);font-size:.72rem;padding:2px 2px 0";
+          empty.textContent = "Nenhum lembrete salvo para este dia.";
+          eventList.appendChild(empty);
+          return;
+        }
+
+        items.forEach((text, index) => {
+          const item = document.createElement("div");
+          item.className = "saved-event";
+          const span = document.createElement("span");
+          span.textContent = text;
+          const del = document.createElement("button");
+          del.type = "button";
+          del.className = "delete-event";
+          del.textContent = "✕";
+          del.setAttribute("aria-label", `Excluir ${text}`);
+          del.addEventListener("click", () => {
+            const all = getStoredEvents();
+            const current = all[key] || [];
+            current.splice(index, 1);
+            if (current.length) all[key] = current;
+            else delete all[key];
+            saveStoredEvents(all);
+            renderEventList();
+            renderCalendar(displayedYear, { focusMonth: selectedDate.getMonth() });
+            showToast("Lembrete removido");
+          });
+          item.append(span, del);
+          eventList.appendChild(item);
+        });
+      }
+
+      function openDay(date) {
+        selectedDate = dateAtNoon(date.getFullYear(), date.getMonth(), date.getDate());
+        const holidays = buildHolidays(selectedDate.getFullYear()).get(keyOf(selectedDate)) || [];
+        const moon = moonPhaseInfo(selectedDate);
+
+        sheetTitle.textContent = `${selectedDate.getDate()} de ${monthNames[selectedDate.getMonth()]}`;
+        sheetDate.textContent = formatLong(selectedDate);
+        details.innerHTML = "";
+
+        const zodiac = zodiacInfo(selectedDate);
+        const season = seasonInfo(selectedDate);
+        const solar = sunTimes(selectedDate);
+        const yearTotal = isLeapYear(selectedDate.getFullYear()) ? 366 : 365;
+        const businessDays = businessDaysInMonth(selectedDate.getFullYear(), selectedDate.getMonth());
+
+        details.appendChild(detailItem("🗓️", "Semana do ano", `Semana ${isoWeek(selectedDate)}`));
+        details.appendChild(detailItem("📆", "Posição no ano", `Dia ${dayOfYear(selectedDate)} de ${yearTotal}`));
+        details.appendChild(detailItem(zodiac.icon, "Signo do zodíaco", zodiac.name));
+        details.appendChild(detailItem(season.icon, "Estação do ano", `${season.name} • Hemisfério Sul`));
+        details.appendChild(detailItem(
+          "🌅",
+          "Nascer e pôr do sol",
+          `Nascer ${formatClock(solar.sunrise)} • Pôr ${formatClock(solar.sunset)} • ${activeLocation.label}`
+        ));
+        details.appendChild(detailItem(
+          "💼",
+          "Dias úteis do mês",
+          `${businessDays} dias úteis em ${monthNames[selectedDate.getMonth()]} (base nacional)`
+        ));
+        details.appendChild(detailItem(moon.icon, "Fase da Lua", `${moon.name} • ${moon.illuminated}% iluminada`));
+
+        if (holidays.length) {
+          holidays.forEach(item => {
+            details.appendChild(detailItem("🎉", item.type, item.name));
+          });
+        } else {
+          details.appendChild(detailItem("✓", "Feriado nacional", "Nenhum feriado nacional nesta data"));
+        }
+
+        eventInput.value = "";
+        renderEventList();
+
+        backdrop.classList.add("open");
+        daySheet.classList.add("open");
+        daySheet.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function hideDaySheet() {
+        backdrop.classList.remove("open");
+        daySheet.classList.remove("open");
+        daySheet.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      locationBtn.addEventListener("click", () => requestDeviceLocation(true));
+
+      themeBtn.addEventListener("click", () => {
+        const current = document.documentElement.dataset.theme;
+        applyTheme(current === "light" ? "dark" : "light");
+      });
+
+      prevYear.addEventListener("click", () => {
+        if (displayedYear > MIN_YEAR) renderCalendar(displayedYear - 1, { focusMonth: 0 });
+      });
+
+      nextYear.addEventListener("click", () => {
+        if (displayedYear < MAX_YEAR) renderCalendar(displayedYear + 1, { focusMonth: 0 });
+      });
+
+      yearSelect.addEventListener("change", () => {
+        renderCalendar(Number(yearSelect.value), { focusMonth: 0 });
+      });
+
+      todayBtn.addEventListener("click", () => {
+        renderCalendar(safeCurrentYear, { focusMonth: now.getMonth() });
+        requestAnimationFrame(() => scrollToMonth(now.getMonth()));
+      });
+
+      closeSheet.addEventListener("click", hideDaySheet);
+      backdrop.addEventListener("click", hideDaySheet);
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") hideDaySheet();
+      });
+
+      eventForm.addEventListener("submit", event => {
+        event.preventDefault();
+        const text = eventInput.value.trim();
+        if (!selectedDate || !text) {
+          showToast("Digite o nome do lembrete");
+          return;
+        }
+
+        const all = getStoredEvents();
+        const key = keyOf(selectedDate);
+        if (!all[key]) all[key] = [];
+        all[key].push(text);
+        saveStoredEvents(all);
+        eventInput.value = "";
+        renderEventList();
+        renderCalendar(displayedYear, { focusMonth: selectedDate.getMonth() });
+        showToast("Lembrete salvo no aparelho");
+      });
+
+      initTheme();
+      initYearSelect();
+      renderCalendar(safeCurrentYear, { focusMonth: now.getMonth() });
+      updateTodayInsights();
+
+      if (!loadStoredLocation() && window.isSecureContext && "geolocation" in navigator) {
+        requestDeviceLocation(false);
+      }
+
+      // Abre automaticamente o mês atual, sem animação na primeira carga.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => scrollToMonth(now.getMonth(), false));
+      });
+
+      // Atualiza o calendário caso a página fique aberta durante a virada do dia.
+      setInterval(() => {
+        const fresh = new Date();
+        if (!sameDate(fresh, now)) location.reload();
+      }, 60000);
+    })();
+  </script>
+</body>
+</html>
